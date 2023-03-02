@@ -24,5 +24,17 @@ async fn completion() -> Result<(), Box<dyn std::error::Error>> {
         .as_str()
         .unwrap(), "text-davinci-003");
 
+    let choices = resp["choices"].as_array().unwrap();
+
+    assert_eq!(choices
+        .get(0)
+        .unwrap()
+        .as_object()
+        .unwrap()
+        .get("index")
+        .unwrap()
+        .as_i64()
+        .unwrap(), 0);
+
     Ok(())
 }
