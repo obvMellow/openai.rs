@@ -1,10 +1,10 @@
 use crate::client::{Args, Client};
-use crate::response::Response;
+use serde_json::Value;
 use tokio::test;
 use std::fs;
 
 #[test]
-async fn completion() {
+async fn completion() -> Result<(), Box<dyn std::error::Error>> {
     let client = Client::new(fs::read_to_string("key.txt")
         .unwrap()
         .as_str());
@@ -12,11 +12,17 @@ async fn completion() {
     let args = Args::new("say this is a test", Option::None, Option::None, Option::None, Option::None);
 
     let resp = client.create_completion(args)
-        .await
-        .unwrap()
-        .json::<Response>()
-        .await
-        .unwrap();
+        .await?
+        .json::<Value>()
+        .await?;
 
-    assert_eq!(resp.model, "gpt-3.5-turbo".to_string());
+    let resp = resp.as_object().unwrap();
+
+    assert_eq!(resp
+        .get("model")
+        .unwrap()
+        .as_str()
+        .unwrap(), "text-davinci-003");
+
+    Ok(())
 }
