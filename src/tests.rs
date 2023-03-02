@@ -1,11 +1,11 @@
 use crate::client::{Args, Client};
 use crate::response::Response;
 use tokio::test;
-use std::env;
+use std::fs;
 
 #[test]
 async fn completion() {
-    let client = Client::new(env::var("OPENAI_KEY")
+    let client = Client::new(fs::read_to_string("key.txt")
         .unwrap()
         .as_str());
 
