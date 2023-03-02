@@ -1,40 +1,94 @@
-use crate::client::{Args, Client};
+use crate::client::Client;
+use crate::args::{CompletionArgs, EditArgs, ImageArgs, ImageResponseFormat, ImageSize};
 use serde_json::Value;
 use tokio::test;
 use std::fs;
 
 #[test]
-async fn completion() -> Result<(), Box<dyn std::error::Error>> {
+async fn completion() {
     let client = Client::new(fs::read_to_string("key.txt")
         .unwrap()
         .as_str());
 
-    let args = Args::new("say this is a test", Option::None, Option::None, Option::None, Option::None);
+    let args = CompletionArgs::new("Say this is a test",
+        Some(32),
+        Some(2),
+        None,
+        Some(1.0)
+    );
 
-    let resp = client.create_completion(args)
-        .await?
+    let resp = client.create_completion(&args)
+        .await
+        .unwrap()
         .json::<Value>()
-        .await?;
+        .await
+        .unwrap();
 
     let resp = resp.as_object().unwrap();
 
     assert_eq!(resp
-        .get("model")
+        .get("object")
         .unwrap()
         .as_str()
-        .unwrap(), "text-davinci-003");
+        .unwrap(), "text_completion");
+}
 
-    let choices = resp["choices"].as_array().unwrap();
+#[test]
+async fn edit() {
+    let client = Client::new(fs::read_to_string("key.txt")
+        .unwrap()
+        .as_str());
 
-    assert_eq!(choices
+    let args = EditArgs::new(None,
+        "Fix spelling mistakes".to_string(),
+        Some("What day of the wek is it?".to_string()),
+        Some(1),
+        Some(1.0),
+        Some(0.7)
+    );
+
+    let resp = client.create_edit(&args)
+        .await
+        .unwrap()
+        .json::<Value>()
+        .await
+        .unwrap();
+
+    assert_eq!(resp.
+        get("object")
+        .unwrap()
+        .as_str()
+        .unwrap(), "edit");
+}
+
+#[test]
+async fn create_image() {
+    let client = Client::new(fs::read_to_string("key.txt")
+        .unwrap()
+        .as_str());
+
+    let args = ImageArgs::new("A realistic cat".to_string(), Some(1), Some(ImageSize::Small), Some(ImageResponseFormat::Url));
+
+    let resp = client.create_image(&args)
+        .await
+        .unwrap()
+        .json::<Value>()
+        .await
+        .unwrap();
+
+    let url = resp
+        .get("data")
+        .unwrap()
+        .as_array()
+        .unwrap()
         .get(0)
         .unwrap()
         .as_object()
         .unwrap()
-        .get("index")
+        .get("url")
         .unwrap()
-        .as_i64()
-        .unwrap(), 0);
+        .as_str()
+        .unwrap();
 
-    Ok(())
+    assert!(url.starts_with("https://"));
 }

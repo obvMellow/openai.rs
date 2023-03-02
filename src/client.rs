@@ -1,60 +1,81 @@
 use reqwest::header::{HeaderMap, CONTENT_TYPE, AUTHORIZATION};
 use reqwest::{Response, Error};
+use serde::{Serialize};
+use reqwest::Client as HttpClient;
 use serde_json::{json, Value};
-
-pub struct Args {
-    pub prompt: String,
-    pub model: String,
-    pub suffix: String,
-    pub max_tokens: u32,
-    pub n: u32,
-    pub temperature: u32,
-}
-
-impl Args {
-    pub fn new(prompt: &str, max_tokens: Option<u32>, n: Option<u32>, suffix: Option<&str>, temperature: Option<u32>) -> Args {
-        Args { prompt: prompt.to_string(),
-            model: "text-davinci-003".to_string(),
-            suffix: suffix.unwrap_or("").to_string(),
-            max_tokens: max_tokens.unwrap_or(16),
-            n: n.unwrap_or(1),
-            temperature: temperature.unwrap_or(1) }
-    }
-}
+use crate::args::{CompletionArgs, EditArgs, ImageArgs, ImageResponseFormat, ImageSize};
 
 pub struct Client {
-    key: String
+    client: HttpClient,
+    api_key: String
 }
 
 impl Client {
     pub fn new(key: &str) -> Client {
-        Client { key: String::from(key) }
+        Client { client: HttpClient::new(), api_key: String::from(key) }
     }
 
-    pub async fn create_completion(&self, args: Args) -> Result<Response, Error> {
-        let client = reqwest::Client::new();
-
+    pub async fn create_completion(&self, args: &CompletionArgs) -> Result<Response, Error> {
         let mut header = HeaderMap::new();
         header.insert(CONTENT_TYPE, "application/json".parse().unwrap());
-        header.insert(AUTHORIZATION, format!("Bearer {}", self.key).parse().unwrap());
+        header.insert(AUTHORIZATION, format!("Bearer {}", self.api_key).parse().unwrap());
 
         let body: Value = json!({
-        "model": args.model,
-        "prompt": args.prompt,
-        "max_tokens": args.max_tokens,
-        "temperature": args.temperature,
-        "top_p": 1,
-        "n": args.n,
-        "stream": false,
-        "logprobs": null,
-        "stop": "\n"
+            "model": args.model,
+            "prompt": args.prompt,
+            "max_tokens": args.max_tokens,
+            "temperature": args.temperature,
+            "top_p": 1,
+            "n": args.n,
+            "stream": false,
+            "logprobs": null
         });
 
-        client.post("https://api.openai.com/v1/completions")
+        self.client.post("https://api.openai.com/v1/completions")
             .headers(header)
             .json(&body)
             .send()
             .await
     }
 
+    pub async fn create_edit(&self, args: &EditArgs) -> Result<Response, Error> {
+        let mut header = HeaderMap::new();
+        header.insert(CONTENT_TYPE, "application/json".parse().unwrap());
+        header.insert(AUTHORIZATION, format!("Bearer {}", self.api_key).parse().unwrap());
+
+        let body = json!({
+            "model": args.model,
+            "input": args.input,
+            "instruction": args.instruction,
+            "n": args.n,
+            "temperature": args.temperature,
+            "top_p": args.top_p
+        });
+
+        self.client.post("https://api.openai.com/v1/edits")
+        .headers(header)
+        .body(body.to_string())
+        .send()
+        .await
+    }
+
+    pub async fn create_image(&self, args: &ImageArgs) -> Result<Response, Error> {
+        let mut header = HeaderMap::new();
+        header.insert(CONTENT_TYPE, "application/json".parse().unwrap());
+        header.insert(AUTHORIZATION, format!("Bearer {}", self.api_key).parse().unwrap());
+
+        let body = json!({
+            "model": "image-alpha-001",
+            "prompt": args.prompt,
+            "n": args.n,
+            "size": args.size,
+            "response_format": args.response_format
+        });
+
+        self.client.post("https://api.openai.com/v1/images/generations")
+            .headers(header)
+            .body(body.to_string())
+            .send()
+            .await
+    }
 }
