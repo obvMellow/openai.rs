@@ -37,3 +37,46 @@ impl EditArgs {
             top_p: top_p.unwrap_or(1.0) }
     }
 }
+
+pub enum ImageSize {
+    Small,
+    Medium,
+    Big
+}
+
+pub enum ImageResponseFormat {
+    Url,
+    B64Json
+}
+
+pub struct ImageArgs {
+    pub prompt: String,
+    pub n: i32,
+    pub size: String,
+    pub response_format: String
+}
+
+impl ImageArgs {
+    pub fn new(prompt: String, n: Option<i32>, size: Option<ImageSize>, response_format: Option<ImageResponseFormat>) -> ImageArgs {
+        let size = match size {
+            Some(val) => {
+                match val {
+                    ImageSize::Small => "256x256".to_string(),
+                    ImageSize::Medium => "512x512".to_string(),
+                    ImageSize::Big => "1024x1024".to_string()
+                }
+            }
+            _ => "1024x1024".to_string()
+        };
+
+        let response_format = match response_format {
+            Some(val) => match val {
+                ImageResponseFormat::Url => "url".to_string(),
+                ImageResponseFormat::B64Json => "b64_json".to_string()
+            }
+            _ => "url".to_string()
+        };
+
+        ImageArgs { prompt: prompt, n: n.unwrap_or(1), size: size, response_format: response_format }
+    }
+}

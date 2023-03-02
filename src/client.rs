@@ -1,23 +1,24 @@
 use reqwest::header::{HeaderMap, CONTENT_TYPE, AUTHORIZATION};
 use reqwest::{Response, Error};
+use serde::{Serialize};
+use reqwest::Client as HttpClient;
 use serde_json::{json, Value};
-use crate::args::{CompletionArgs, EditArgs};
+use crate::args::{CompletionArgs, EditArgs, ImageArgs, ImageResponseFormat, ImageSize};
 
 pub struct Client {
-    key: String
+    client: HttpClient,
+    api_key: String
 }
 
 impl Client {
     pub fn new(key: &str) -> Client {
-        Client { key: String::from(key) }
+        Client { client: HttpClient::new(), api_key: String::from(key) }
     }
 
-    pub async fn create_completion(&self, args: CompletionArgs) -> Result<Response, Error> {
-        let client = reqwest::Client::new();
-
+    pub async fn create_completion(&self, args: &CompletionArgs) -> Result<Response, Error> {
         let mut header = HeaderMap::new();
         header.insert(CONTENT_TYPE, "application/json".parse().unwrap());
-        header.insert(AUTHORIZATION, format!("Bearer {}", self.key).parse().unwrap());
+        header.insert(AUTHORIZATION, format!("Bearer {}", self.api_key).parse().unwrap());
 
         let body: Value = json!({
             "model": args.model,
@@ -30,19 +31,17 @@ impl Client {
             "logprobs": null
         });
 
-        client.post("https://api.openai.com/v1/completions")
+        self.client.post("https://api.openai.com/v1/completions")
             .headers(header)
             .json(&body)
             .send()
             .await
     }
 
-    pub async fn create_edit(&self, args: EditArgs) -> Result<Response, Error> {
-        let client = reqwest::Client::new();
-
+    pub async fn create_edit(&self, args: &EditArgs) -> Result<Response, Error> {
         let mut header = HeaderMap::new();
         header.insert(CONTENT_TYPE, "application/json".parse().unwrap());
-        header.insert(AUTHORIZATION, format!("Bearer {}", self.key).parse().unwrap());
+        header.insert(AUTHORIZATION, format!("Bearer {}", self.api_key).parse().unwrap());
 
         let body = json!({
             "model": args.model,
@@ -53,10 +52,30 @@ impl Client {
             "top_p": args.top_p
         });
 
-        client.post("https://api.openai.com/v1/edits")
+        self.client.post("https://api.openai.com/v1/edits")
         .headers(header)
         .body(body.to_string())
         .send()
         .await
+    }
+
+    pub async fn create_image(&self, args: &ImageArgs) -> Result<Response, Error> {
+        let mut header = HeaderMap::new();
+        header.insert(CONTENT_TYPE, "application/json".parse().unwrap());
+        header.insert(AUTHORIZATION, format!("Bearer {}", self.api_key).parse().unwrap());
+
+        let body = json!({
+            "model": "image-alpha-001",
+            "prompt": args.prompt,
+            "n": args.n,
+            "size": args.size,
+            "response_format": args.response_format
+        });
+
+        self.client.post("https://api.openai.com/v1/images/generations")
+            .headers(header)
+            .body(body.to_string())
+            .send()
+            .await
     }
 }
