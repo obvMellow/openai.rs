@@ -1,10 +1,14 @@
 use crate::client::{Args, Client};
 use crate::response::Response;
 use tokio::test;
+use std::env;
 
 #[test]
 async fn completion() {
-    let client = Client::new("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");
+    let client = Client::new(env::args()
+        .nth_back(0)
+        .unwrap()
+        .as_str());
 
     let args = Args::new("say this is a test", Option::None, Option::None, Option::None, Option::None);
 
