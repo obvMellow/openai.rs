@@ -17,20 +17,14 @@ async fn completion() {
         Some(1.0)
     );
 
-    let resp = client.create_completion(&args)
-        .await
-        .unwrap()
-        .json::<Value>()
-        .await
-        .unwrap();
+    let resp = client.create_completion(&args).await.unwrap();
 
-    let resp = resp.as_object().unwrap();
+    let text = Client::get_completion_text(resp, 0).await;
 
-    assert_eq!(resp
-        .get("object")
-        .unwrap()
-        .as_str()
-        .unwrap(), "text_completion");
+    match text {
+        Some(val) => assert!(!val.is_empty()),
+        None => panic!("Expected a String, got None for completion text")
+    }
 }
 
 #[test]
