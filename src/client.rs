@@ -7,19 +7,20 @@ use crate::args::{CompletionArgs, EditArgs, ImageArgs, ImageResponseFormat, Imag
 
 pub struct Client {
     client: HttpClient,
-    api_key: String
+    api_key: String,
+    header: HeaderMap
 }
 
 impl Client {
     pub fn new(key: &str) -> Client {
-        Client { client: HttpClient::new(), api_key: String::from(key) }
+        let mut header = HeaderMap::new();
+        header.insert(CONTENT_TYPE, "application/json".parse().unwrap());
+        header.insert(AUTHORIZATION, format!("Bearer {}", key).parse().unwrap());
+
+        Client { client: HttpClient::new(), api_key: String::from(key), header }
     }
 
     pub async fn create_completion(&self, args: &CompletionArgs) -> Result<Response, Error> {
-        let mut header = HeaderMap::new();
-        header.insert(CONTENT_TYPE, "application/json".parse().unwrap());
-        header.insert(AUTHORIZATION, format!("Bearer {}", self.api_key).parse().unwrap());
-
         let body: Value = json!({
             "model": args.model,
             "prompt": args.prompt,
@@ -32,17 +33,13 @@ impl Client {
         });
 
         self.client.post("https://api.openai.com/v1/completions")
-            .headers(header)
+            .headers(self.header.clone())
             .json(&body)
             .send()
             .await
     }
 
     pub async fn create_edit(&self, args: &EditArgs) -> Result<Response, Error> {
-        let mut header = HeaderMap::new();
-        header.insert(CONTENT_TYPE, "application/json".parse().unwrap());
-        header.insert(AUTHORIZATION, format!("Bearer {}", self.api_key).parse().unwrap());
-
         let body = json!({
             "model": args.model,
             "input": args.input,
@@ -53,17 +50,13 @@ impl Client {
         });
 
         self.client.post("https://api.openai.com/v1/edits")
-        .headers(header)
+        .headers(self.header.clone())
         .body(body.to_string())
         .send()
         .await
     }
 
     pub async fn create_image(&self, args: &ImageArgs) -> Result<Response, Error> {
-        let mut header = HeaderMap::new();
-        header.insert(CONTENT_TYPE, "application/json".parse().unwrap());
-        header.insert(AUTHORIZATION, format!("Bearer {}", self.api_key).parse().unwrap());
-
         let body = json!({
             "model": "image-alpha-001",
             "prompt": args.prompt,
@@ -73,7 +66,7 @@ impl Client {
         });
 
         self.client.post("https://api.openai.com/v1/images/generations")
-            .headers(header)
+            .headers(self.header.clone())
             .body(body.to_string())
             .send()
             .await

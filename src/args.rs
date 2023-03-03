@@ -77,6 +77,6 @@ impl ImageArgs {
             _ => "url".to_string()
         };
 
-        ImageArgs { prompt: prompt, n: n.unwrap_or(1), size: size, response_format: response_format }
+        ImageArgs { prompt, n: n.unwrap_or(1), size, response_format }
     }
 }
