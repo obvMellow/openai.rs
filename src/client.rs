@@ -1,9 +1,8 @@
 use reqwest::header::{HeaderMap, CONTENT_TYPE, AUTHORIZATION};
 use reqwest::{Response, Error};
-use serde::{Serialize};
 use reqwest::Client as HttpClient;
 use serde_json::{json, Value};
-use crate::args::{CompletionArgs, EditArgs, ImageArgs, ImageResponseFormat, ImageSize};
+use crate::args::{CompletionArgs, EditArgs, ImageArgs};
 
 pub struct Client {
     client: HttpClient,
