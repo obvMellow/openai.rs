@@ -1,6 +1,6 @@
-mod client;
-mod response;
-mod args;
+pub mod client;
+pub mod response;
+pub mod args;
 
 #[cfg(test)]
 mod tests;
