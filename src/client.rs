@@ -71,4 +71,46 @@ impl Client {
             .send()
             .await
     }
+
+    pub async fn get_completion_text(resp: Response, index: usize) -> Option<String> {
+        let resp = match resp.json::<Value>().await {
+            Ok(val) => val,
+            _ => Value::Null
+        };
+
+        let resp = match resp {
+            Value::Object(val) => val,
+            _ => return None
+        };
+
+        let resp = match resp.get("choices") {
+            Some(val) => val,
+            _ => return None
+        };
+
+        let resp = match resp.as_array() {
+            Some(val) => val,
+            _ => return None
+        };
+
+        let resp = match resp.get(index) {
+            Some(val) => val,
+            _ => return None
+        };
+
+        let resp = match resp.as_object() {
+            Some(val) => val,
+            _ => return None
+        };
+
+        let resp = match resp.get("text") {
+            Some(val) => val,
+            _ => return None
+        };
+
+        match resp.as_str() {
+            Some(val) => return Some(val.to_string()),
+            _ => return None
+        }
+    }
 }
