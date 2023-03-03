@@ -1,5 +1,5 @@
 use openai::{client::Client, args::CompletionArgs};
-use std::io::{stdin, stdout, BufWriter, Write};
+use std::io::{stdin, stdout, Write};
 use std::fs;
 
 #[tokio::main]
