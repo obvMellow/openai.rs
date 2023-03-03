@@ -76,6 +76,7 @@ async fn create_image() {
         .await
         .unwrap();
 
+    // What the fuck is this just to get the image url lol
     let url = resp
         .get("data")
         .unwrap()
