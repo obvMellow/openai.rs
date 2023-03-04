@@ -1,11 +1,11 @@
 use crate::client::Client;
 use crate::args::{CompletionArgs, EditArgs, ImageArgs, ImageResponseFormat, ImageSize};
 use crate::response::*;
-use std::fs;
+use std::env;
 
 #[tokio::test]
 async fn completion() {
-    let client = Client::new(fs::read_to_string("key.txt")
+    let client = Client::new(env::var("OPENAI_API_KEY")
         .unwrap()
         .as_str());
 
@@ -28,7 +28,7 @@ async fn completion() {
 
 #[tokio::test]
 async fn edit() {
-    let client = Client::new(fs::read_to_string("key.txt")
+    let client = Client::new(env::var("OPENAI_API_KEY")
         .unwrap()
         .as_str());
 
@@ -52,7 +52,7 @@ async fn edit() {
 
 #[tokio::test]
 async fn create_image() {
-    let client = Client::new(fs::read_to_string("key.txt")
+    let client = Client::new(env::var("OPENAI_API_KEY")
         .unwrap()
         .as_str());
 
