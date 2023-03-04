@@ -79,7 +79,7 @@ fn get_key() {
 fn set_key() {
     let mut client = Client::new("key");
 
-    client.set_key("new key".to_string());
+    client.set_key("new key");
 
     assert_eq!(client.get_key(), "new key");
 }

@@ -96,7 +96,7 @@ impl Client {
     }
 
     /// Sets the client's api key to the value of given key.
-    pub fn set_key(&mut self, new_key: String) {
-        self.api_key = new_key;
+    pub fn set_key(&mut self, new_key: &str) {
+        self.api_key = new_key.to_string();
     }
 }
