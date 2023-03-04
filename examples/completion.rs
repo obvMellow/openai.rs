@@ -1,4 +1,4 @@
-use openai::{client::Client, args::CompletionArgs};
+use openai::{client::Client, args::CompletionArgs, response::{CompletionResp, Content}};
 use std::io::{stdin, stdout, Write};
 use std::fs;
 
@@ -23,7 +23,7 @@ async fn main() {
         .await
         .unwrap();
 
-    let completion = Client::get_completion_text(resp, 0)
+    let completion = resp.get_content(0)
         .await
         .unwrap();
 
