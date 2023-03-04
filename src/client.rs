@@ -91,7 +91,12 @@ impl Client {
     }
 
     /// Returns a reference to the client's api key.
-    pub fn key(&self) -> &String {
+    pub fn get_key(&self) -> &String {
         return &self.api_key;
+    }
+
+    /// Sets the client's api key to the value of given key.
+    pub fn set_key(&mut self, new_key: &str) {
+        self.api_key = new_key.to_string();
     }
 }

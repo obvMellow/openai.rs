@@ -1,10 +1,9 @@
 use crate::client::Client;
 use crate::args::{CompletionArgs, EditArgs, ImageArgs, ImageResponseFormat, ImageSize};
 use crate::response::*;
-use tokio::test;
 use std::fs;
 
-#[test]
+#[tokio::test]
 async fn completion() {
     let client = Client::new(fs::read_to_string("key.txt")
         .unwrap()
@@ -27,7 +26,7 @@ async fn completion() {
     }
 }
 
-#[test]
+#[tokio::test]
 async fn edit() {
     let client = Client::new(fs::read_to_string("key.txt")
         .unwrap()
@@ -51,7 +50,7 @@ async fn edit() {
     }
 }
 
-#[test]
+#[tokio::test]
 async fn create_image() {
     let client = Client::new(fs::read_to_string("key.txt")
         .unwrap()
@@ -67,4 +66,20 @@ async fn create_image() {
         Some(val) => assert!(val.starts_with("https://")),
         None => panic!("Expected a String, got None for image url!")
     }
+}
+
+#[test]
+fn get_key() {
+    let client = Client::new("key");
+
+    assert_eq!(client.get_key(), "key");
+}
+
+#[test]
+fn set_key() {
+    let mut client = Client::new("key");
+
+    client.set_key("new key");
+
+    assert_eq!(client.get_key(), "new key");
 }
