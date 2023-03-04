@@ -1,5 +1,5 @@
 use reqwest::header::{HeaderMap, CONTENT_TYPE, AUTHORIZATION};
-use reqwest::{Response, Error};
+use reqwest::Error;
 use reqwest::Client as HttpClient;
 use serde_json::{json, Value};
 use crate::args::{CompletionArgs, EditArgs, ImageArgs};

@@ -1,4 +1,4 @@
-use openai::{client::Client, args::CompletionArgs, response::{CompletionResp, Content}};
+use openai::{client::Client, args::CompletionArgs, response::Content};
 use std::io::{stdin, stdout, Write};
 use std::fs;
 
