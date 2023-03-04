@@ -41,43 +41,14 @@ impl Content for ImageResp {
 }
 
 async fn get_content_helper(resp: Response, index: usize, arr: &str, txt: &str) -> Option<String> {
-    let resp = match resp.json::<Value>().await {
-        Ok(val) => val,
-        _ => Value::Null
-    };
-
-    let resp = match resp {
-        Value::Object(val) => val,
-        _ => return None
-    };
-
-    let resp = match resp.get(arr) {
-        Some(val) => val,
-        _ => return None
-    };
-
-    let resp = match resp.as_array() {
-        Some(val) => val,
-        _ => return None
-    };
-
-    let resp = match resp.get(index) {
-        Some(val) => val,
-        _ => return None
-    };
-
-    let resp = match resp.as_object() {
-        Some(val) => val,
-        _ => return None
-    };
-
-    let resp = match resp.get(txt) {
-        Some(val) => val,
-        _ => return None
-    };
-
-    match resp.as_str() {
-        Some(val) => return Some(val.to_string()),
-        _ => return None
-    }
+    resp.json::<Value>()
+        .await.ok()?
+        .as_object()?
+        .get(arr)?
+        .as_array()?
+        .get(index)?
+        .as_object()?
+        .get(txt)?
+        .as_str()
+        .map(|s| s.to_string())
 }
