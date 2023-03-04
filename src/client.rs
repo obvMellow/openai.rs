@@ -1,9 +1,9 @@
 use reqwest::header::{HeaderMap, CONTENT_TYPE, AUTHORIZATION};
-use reqwest::{Response, Error};
-use serde::{Serialize};
+use reqwest::Error;
 use reqwest::Client as HttpClient;
 use serde_json::{json, Value};
-use crate::args::{CompletionArgs, EditArgs, ImageArgs, ImageResponseFormat, ImageSize};
+use crate::args::{CompletionArgs, EditArgs, ImageArgs};
+use crate::response::{CompletionResp, EditResp, ImageResp};
 
 pub struct Client {
     client: HttpClient,
@@ -20,7 +20,8 @@ impl Client {
         Client { client: HttpClient::new(), api_key: String::from(key), header }
     }
 
-    pub async fn create_completion(&self, args: &CompletionArgs) -> Result<Response, Error> {
+    /// Makes an api call to OpenAI Completion API and returns the response.
+    pub async fn create_completion(&self, args: &CompletionArgs) -> Result<CompletionResp, Error> {
         let body: Value = json!({
             "model": args.model,
             "prompt": args.prompt,
@@ -32,14 +33,20 @@ impl Client {
             "logprobs": null
         });
 
-        self.client.post("https://api.openai.com/v1/completions")
+        let resp = self.client.post("https://api.openai.com/v1/completions")
             .headers(self.header.clone())
             .json(&body)
             .send()
-            .await
+            .await;
+
+        match resp {
+            Ok(val) => return Ok(CompletionResp { resp: val }),
+            Err(e) => return Err(e)
+        }
     }
 
-    pub async fn create_edit(&self, args: &EditArgs) -> Result<Response, Error> {
+    /// Makes an api call to OpenAI Edit API and returns the response.
+    pub async fn create_edit(&self, args: &EditArgs) -> Result<EditResp, Error> {
         let body = json!({
             "model": args.model,
             "input": args.input,
@@ -49,14 +56,20 @@ impl Client {
             "top_p": args.top_p
         });
 
-        self.client.post("https://api.openai.com/v1/edits")
+        let resp = self.client.post("https://api.openai.com/v1/edits")
         .headers(self.header.clone())
         .body(body.to_string())
         .send()
-        .await
+        .await;
+
+        match resp {
+            Ok(val) => return Ok(EditResp { resp: val }),
+            Err(e) => return Err(e)
+        }
     }
 
-    pub async fn create_image(&self, args: &ImageArgs) -> Result<Response, Error> {
+    /// Makes an api call to OpenAI Image API and returns the response.
+    pub async fn create_image(&self, args: &ImageArgs) -> Result<ImageResp, Error> {
         let body = json!({
             "model": "image-alpha-001",
             "prompt": args.prompt,
@@ -65,52 +78,20 @@ impl Client {
             "response_format": args.response_format
         });
 
-        self.client.post("https://api.openai.com/v1/images/generations")
+        let resp = self.client.post("https://api.openai.com/v1/images/generations")
             .headers(self.header.clone())
             .body(body.to_string())
             .send()
-            .await
+            .await;
+
+        match resp {
+            Ok(val) => return Ok(ImageResp { resp: val }),
+            Err(e) => return Err(e)
+        }
     }
 
-    pub async fn get_completion_text(resp: Response, index: usize) -> Option<String> {
-        let resp = match resp.json::<Value>().await {
-            Ok(val) => val,
-            _ => Value::Null
-        };
-
-        let resp = match resp {
-            Value::Object(val) => val,
-            _ => return None
-        };
-
-        let resp = match resp.get("choices") {
-            Some(val) => val,
-            _ => return None
-        };
-
-        let resp = match resp.as_array() {
-            Some(val) => val,
-            _ => return None
-        };
-
-        let resp = match resp.get(index) {
-            Some(val) => val,
-            _ => return None
-        };
-
-        let resp = match resp.as_object() {
-            Some(val) => val,
-            _ => return None
-        };
-
-        let resp = match resp.get("text") {
-            Some(val) => val,
-            _ => return None
-        };
-
-        match resp.as_str() {
-            Some(val) => return Some(val.to_string()),
-            _ => return None
-        }
+    /// Returns a reference to the client's api key.
+    pub fn key(&self) -> &String {
+        return &self.api_key;
     }
 }

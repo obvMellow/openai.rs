@@ -1,6 +1,6 @@
 use crate::client::Client;
 use crate::args::{CompletionArgs, EditArgs, ImageArgs, ImageResponseFormat, ImageSize};
-use serde_json::Value;
+use crate::response::*;
 use tokio::test;
 use std::fs;
 
@@ -19,7 +19,7 @@ async fn completion() {
 
     let resp = client.create_completion(&args).await.unwrap();
 
-    let text = Client::get_completion_text(resp, 0).await;
+    let text = resp.get_content(0).await;
 
     match text {
         Some(val) => assert!(!val.is_empty()),
@@ -41,18 +41,14 @@ async fn edit() {
         Some(0.7)
     );
 
-    let resp = client.create_edit(&args)
-        .await
-        .unwrap()
-        .json::<Value>()
-        .await
-        .unwrap();
+    let resp = client.create_edit(&args).await.unwrap();
 
-    assert_eq!(resp.
-        get("object")
-        .unwrap()
-        .as_str()
-        .unwrap(), "edit");
+    let text = resp.get_content(0).await;
+
+    match text {
+        Some(val) => assert!(!val.is_empty()),
+        None => panic!("Expected a String, got None for edit text!")
+    }
 }
 
 #[test]
@@ -63,27 +59,12 @@ async fn create_image() {
 
     let args = ImageArgs::new("A realistic cat".to_string(), Some(1), Some(ImageSize::Small), Some(ImageResponseFormat::Url));
 
-    let resp = client.create_image(&args)
-        .await
-        .unwrap()
-        .json::<Value>()
-        .await
-        .unwrap();
+    let resp = client.create_image(&args).await.unwrap();
 
-    // What the fuck is this just to get the image url lol
-    let url = resp
-        .get("data")
-        .unwrap()
-        .as_array()
-        .unwrap()
-        .get(0)
-        .unwrap()
-        .as_object()
-        .unwrap()
-        .get("url")
-        .unwrap()
-        .as_str()
-        .unwrap();
+    let img = resp.get_content(0).await;
 
-    assert!(url.starts_with("https://"));
+    match img {
+        Some(val) => assert!(val.starts_with("https://")),
+        None => panic!("Expected a String, got None for image url!")
+    }
 }
