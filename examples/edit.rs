@@ -22,8 +22,8 @@ async fn main() {
         .unwrap();
 
     let args = EditArgs::new(None,
-        instruction,
-        Some(prompt),
+        &instruction,
+        &prompt,
         None,
         None,
         None);

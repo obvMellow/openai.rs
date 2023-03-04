@@ -28,10 +28,10 @@ pub struct EditArgs {
 }
 
 impl EditArgs {
-    pub fn new(model: Option<String>, instruction: String, input: Option<String>, n: Option<i32>, temperature: Option<f64>, top_p: Option<f64>) -> EditArgs {
-        EditArgs { model: model.unwrap_or("text-davinci-edit-001".to_string()),
-            input: input.unwrap_or("".to_string()),
-            instruction,
+    pub fn new(model: Option<&str>, instruction: &str, input: &str, n: Option<i32>, temperature: Option<f64>, top_p: Option<f64>) -> EditArgs {
+        EditArgs { model: model.unwrap_or("text-davinci-edit-001").to_string(),
+            input: input.to_string(),
+            instruction: instruction.to_string(),
             n: n.unwrap_or(1),
             temperature: temperature.unwrap_or(1.0),
             top_p: top_p.unwrap_or(1.0) }
@@ -57,7 +57,7 @@ pub struct ImageArgs {
 }
 
 impl ImageArgs {
-    pub fn new(prompt: String, n: Option<i32>, size: Option<ImageSize>, response_format: Option<ImageResponseFormat>) -> ImageArgs {
+    pub fn new(prompt: &str, n: Option<i32>, size: Option<ImageSize>, response_format: Option<ImageResponseFormat>) -> ImageArgs {
         let size = match size {
             Some(val) => {
                 match val {
@@ -77,6 +77,6 @@ impl ImageArgs {
             _ => "url".to_string()
         };
 
-        ImageArgs { prompt, n: n.unwrap_or(1), size, response_format }
+        ImageArgs { prompt: prompt.to_string(), n: n.unwrap_or(1), size, response_format }
     }
 }

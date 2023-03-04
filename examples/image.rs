@@ -15,7 +15,7 @@ async fn main() {
 
     println!("Generating image...\n");
 
-    let args = ImageArgs::new(prompt, Some(1), Some(ImageSize::Big), None);
+    let args = ImageArgs::new(&prompt, Some(1), Some(ImageSize::Big), None);
 
     let client = Client::new(fs::read_to_string("key.txt")
         .unwrap()

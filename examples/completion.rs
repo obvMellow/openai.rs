@@ -13,7 +13,7 @@ async fn main() {
         .read_line(&mut prompt)
         .unwrap();
 
-    let args = CompletionArgs::new(prompt.as_str(), None, None, None, None);
+    let args = CompletionArgs::new(&prompt, None, None, None, None);
 
     let client = Client::new(fs::read_to_string("key.txt")
         .unwrap()

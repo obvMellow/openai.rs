@@ -33,8 +33,8 @@ async fn edit() {
         .as_str());
 
     let args = EditArgs::new(None,
-        "Fix spelling mistakes".to_string(),
-        Some("What day of the wek is it?".to_string()),
+        "Fix spelling mistakes",
+        "What day of the wek is it?",
         Some(1),
         Some(1.0),
         Some(0.7)
@@ -56,7 +56,7 @@ async fn create_image() {
         .unwrap()
         .as_str());
 
-    let args = ImageArgs::new("A realistic cat".to_string(), Some(1), Some(ImageSize::Small), Some(ImageResponseFormat::Url));
+    let args = ImageArgs::new("A realistic cat", Some(1), Some(ImageSize::Small), Some(ImageResponseFormat::Url));
 
     let resp = client.create_image(&args).await.unwrap();
 
