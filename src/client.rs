@@ -20,6 +20,7 @@ impl Client {
         Client { client: HttpClient::new(), api_key: String::from(key), header }
     }
 
+    /// Makes an api call to OpenAI Completion API and returns the response.
     pub async fn create_completion(&self, args: &CompletionArgs) -> Result<CompletionResp, Error> {
         let body: Value = json!({
             "model": args.model,
@@ -44,6 +45,7 @@ impl Client {
         }
     }
 
+    /// Makes an api call to OpenAI Edit API and returns the response.
     pub async fn create_edit(&self, args: &EditArgs) -> Result<EditResp, Error> {
         let body = json!({
             "model": args.model,
@@ -66,6 +68,7 @@ impl Client {
         }
     }
 
+    /// Makes an api call to OpenAI Image API and returns the response.
     pub async fn create_image(&self, args: &ImageArgs) -> Result<ImageResp, Error> {
         let body = json!({
             "model": "image-alpha-001",
@@ -85,5 +88,10 @@ impl Client {
             Ok(val) => return Ok(ImageResp { resp: val }),
             Err(e) => return Err(e)
         }
+    }
+
+    /// Returns a reference to the client's api key.
+    pub fn key(&self) -> &String {
+        return &self.api_key;
     }
 }
