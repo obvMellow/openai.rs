@@ -51,7 +51,7 @@ async fn edit() {
 }
 
 #[tokio::test]
-async fn create_image() {
+async fn image() {
     let client = Client::new(env::var("OPENAI_API_KEY")
         .unwrap()
         .as_str());
@@ -67,6 +67,25 @@ async fn create_image() {
         None => panic!("Expected a String, got None for image url!")
     }
 }
+
+#[tokio::test]
+async fn models() {
+    let client = Client::new(env::var("OPENAI_API_KEY")
+        .unwrap()
+        .as_str());
+
+    let models = client.get_models().await.unwrap();
+
+    assert!(models
+        .as_object()
+        .unwrap()
+        .get("data")
+        .unwrap()
+        .as_array()
+        .unwrap()
+        .len() > 60);
+}
+
 
 #[test]
 fn get_key() {

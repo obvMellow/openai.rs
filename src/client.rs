@@ -3,7 +3,7 @@ use reqwest::Error;
 use reqwest::Client as HttpClient;
 use serde_json::{json, Value};
 use crate::args::{CompletionArgs, EditArgs, ImageArgs};
-use crate::response::{CompletionResp, EditResp, ImageResp};
+use crate::response::*;
 
 pub struct Client {
     client: HttpClient,
@@ -98,5 +98,17 @@ impl Client {
     /// Sets the client's api key to the value of given key.
     pub fn set_key(&mut self, new_key: &str) {
         self.api_key = new_key.to_string();
+    }
+
+    /// Returns a json listing all the models
+    pub async fn get_models(&self) -> Result<Value, Error> {
+        let resp = self.client.get("https://api.openai.com/v1/models")
+        .headers(self.header.clone())
+        .send()
+        .await?
+        .json::<Value>()
+        .await?;
+
+        Ok(resp)
     }
 }
