@@ -16,10 +16,10 @@ Then you can use the methods to interact with the API:
 
 ```rust
 let args = CompletionArgs::new("Say this is a test",
-    Some(32),
-    Some(2),
-    None,
-    Some(1.0)
+    Some(32), // Max tokens
+    Some(2), // Amount of completions (default: 1)
+    None, // Suffix (default: "")
+    Some(1.0) // Temperature
 );
 
 let completion = client.create_completion(&args)
