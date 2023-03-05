@@ -1,4 +1,4 @@
-use openai::{args::EditArgs, client::Client, response::Content};
+use openai_rs::{args::EditArgs, client::Client, response::Content};
 use std::io::{stdin, stdout, Write};
 use std::fs;
 
