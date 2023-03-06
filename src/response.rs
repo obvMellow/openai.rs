@@ -10,18 +10,22 @@ pub trait Content {
     async fn get_json(self) -> Result<Value, Error>;
 }
 
+#[derive(Debug)]
 pub struct CompletionResp {
     pub resp: Response
 }
 
+#[derive(Debug)]
 pub struct EditResp {
     pub resp: Response
 }
 
+#[derive(Debug)]
 pub struct ImageResp {
     pub resp: Response
 }
 
+#[derive(Debug)]
 pub struct ChatResp {
     pub resp: Response
 }

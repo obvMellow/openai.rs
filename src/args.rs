@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+#[derive(Debug)]
 pub struct CompletionArgs {
     pub prompt: String,
     pub model: String,
@@ -20,6 +21,7 @@ impl CompletionArgs {
     }
 }
 
+#[derive(Debug)]
 pub struct EditArgs {
     pub model: String,
     pub input: String,
@@ -51,6 +53,7 @@ pub enum ImageResponseFormat {
     B64Json
 }
 
+#[derive(Debug)]
 pub struct ImageArgs {
     pub prompt: String,
     pub n: i32,
@@ -83,6 +86,7 @@ impl ImageArgs {
     }
 }
 
+#[derive(Debug)]
 pub struct ChatArgs {
     pub model: String,
     pub messages: Vec<HashMap<String, String>>,
@@ -107,7 +111,7 @@ impl ChatArgs {
             n: n.unwrap_or(1),
             temperature: temperature.unwrap_or(1.0),
             top_p: top_p.unwrap_or(1.0),
-            max_tokens: max_tokens.unwrap_or(u32::MAX),
+            max_tokens: max_tokens.unwrap_or(2048),
             presence_penalty: presence_penalty.unwrap_or(0.0),
             frequency_penalty: frequency_penalty.unwrap_or(0.0) }
     }

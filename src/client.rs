@@ -112,10 +112,10 @@ impl Client {
         Ok(resp)
     }
 
-    pub async fn create_chat_completion(&self, args: ChatArgs) -> Result<ChatResp, Error> {
+    pub async fn create_chat_completion(&self, args: &ChatArgs) -> Result<ChatResp, Error> {
         let body = json!({
         "model": args.model,
-        "prompt": args.messages,
+        "messages": args.messages,
         "max_tokens": args.max_tokens,
         "temperature": args.temperature,
         "top_p": args.top_p,
@@ -124,7 +124,7 @@ impl Client {
         "frequency_penalty": args.frequency_penalty
         });
 
-        let resp = self.client.post("https://api.openai.com/v1/completions")
+        let resp = self.client.post("https://api.openai.com/v1/chat/completions")
         .headers(self.header.clone())
         .json(&body)
         .send()
