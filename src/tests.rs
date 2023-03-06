@@ -1,6 +1,7 @@
 use crate::client::Client;
-use crate::args::{CompletionArgs, EditArgs, ImageArgs, ImageResponseFormat, ImageSize};
+use crate::args::*;
 use crate::response::*;
+use std::collections::HashMap;
 use std::env;
 
 #[tokio::test]
@@ -102,3 +103,31 @@ fn set_key() {
 
     assert_eq!(client.get_key(), "new key");
 }
+
+
+#[tokio::test]
+async fn chat_completion() {
+    let client = Client::new(env::var("OPENAI_API_KEY")
+        .unwrap()
+        .as_str());
+
+    let mut message1: HashMap<String, String> = HashMap::new();
+    message1.insert("role".to_string(), "user".to_string());
+    message1.insert("content".to_string(), "Who won the world series in 2020?".to_string());
+
+    let mut message2: HashMap<String, String> = HashMap::new();
+    message2.insert("role".to_string(), "system".to_string());
+    message2.insert("content".to_string(), "You are a helpful assistant.".to_string());
+
+    let messages: Vec<HashMap<String, String>> = vec![message1, message2];
+
+    let args = ChatArgs::new(messages, None, None, None, None, None, None);
+
+    let resp = client.create_chat_completion(args).await;
+
+    match resp {
+        Err(e) => panic!("An error occured while creating chat completion: {:?}", e),
+        _ => ()
+    }
+}
+

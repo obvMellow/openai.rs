@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 pub struct CompletionArgs {
     pub prompt: String,
     pub model: String,
@@ -78,5 +80,35 @@ impl ImageArgs {
         };
 
         ImageArgs { prompt: prompt.to_string(), n: n.unwrap_or(1), size, response_format }
+    }
+}
+
+pub struct ChatArgs {
+    pub model: String,
+    pub messages: Vec<HashMap<String, String>>,
+    pub n: i32,
+    pub temperature: f64,
+    pub top_p: f64,
+    pub max_tokens: u32,
+    pub presence_penalty: f64,
+    pub frequency_penalty: f64,
+}
+
+impl ChatArgs {
+    pub fn new(messages: Vec<HashMap<String, String>>,
+               max_tokens: Option<u32>,
+               n: Option<i32>,
+               temperature: Option<f64>,
+               top_p: Option<f64>,
+               presence_penalty: Option<f64>,
+               frequency_penalty: Option<f64>) -> ChatArgs {
+        ChatArgs { model: "gpt-3.5-turbo".to_string(),
+            messages,
+            n: n.unwrap_or(1),
+            temperature: temperature.unwrap_or(1.0),
+            top_p: top_p.unwrap_or(1.0),
+            max_tokens: max_tokens.unwrap_or(u32::MAX),
+            presence_penalty: presence_penalty.unwrap_or(0.0),
+            frequency_penalty: frequency_penalty.unwrap_or(0.0) }
     }
 }
