@@ -10,12 +10,16 @@ A wrapper for OpenAI API written in Rust
 First of all, you need to initialize a client.
 
 ```rust
+use openai_rs::client::Client;
+
 let client = Client::new("Your API key goes here");
 ```
 
 Then you can use the methods to interact with the API:
 
 ```rust
+use openai_rs::args::CompletionArgs;
+
 let args = CompletionArgs::new("Say this is a test",
     Some(32), // Max tokens
     Some(2), // Amount of completions (default: 1)
@@ -32,6 +36,8 @@ This method returns the response returned from the API.
 You can do the following to get the content from the response:
 
 ```rust
+use openai_rs::response::Content;
+
 // Get the text data from the response
 let text = completion.get_content(0)
     .await
