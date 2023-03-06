@@ -40,8 +40,8 @@ impl Client {
             .await;
 
         match resp {
-            Ok(val) => return Ok(CompletionResp { resp: val }),
-            Err(e) => return Err(e)
+            Ok(val) => Ok(CompletionResp { resp: val }),
+            Err(e) => Err(e)
         }
     }
 
@@ -63,8 +63,8 @@ impl Client {
         .await;
 
         match resp {
-            Ok(val) => return Ok(EditResp { resp: val }),
-            Err(e) => return Err(e)
+            Ok(val) => Ok(EditResp { resp: val }),
+            Err(e) => Err(e)
         }
     }
 
@@ -85,14 +85,14 @@ impl Client {
             .await;
 
         match resp {
-            Ok(val) => return Ok(ImageResp { resp: val }),
-            Err(e) => return Err(e)
+            Ok(val) => Ok(ImageResp { resp: val }),
+            Err(e) => Err(e)
         }
     }
 
     /// Returns a reference to the client's api key.
     pub fn get_key(&self) -> &String {
-        return &self.api_key;
+        &self.api_key
     }
 
     /// Sets the client's api key to the value of given key.
