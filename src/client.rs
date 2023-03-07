@@ -2,7 +2,7 @@ use reqwest::header::{HeaderMap, CONTENT_TYPE, AUTHORIZATION};
 use reqwest::Error;
 use reqwest::Client as HttpClient;
 use serde_json::{json, Value};
-use crate::args::{CompletionArgs, EditArgs, ImageArgs};
+use crate::args::*;
 use crate::response::*;
 
 pub struct Client {
@@ -110,5 +110,26 @@ impl Client {
         .await?;
 
         Ok(resp)
+    }
+
+    pub async fn create_chat_completion(&self, args: &ChatArgs) -> Result<ChatResp, Error> {
+        let body = json!({
+        "model": args.model,
+        "messages": args.messages,
+        "max_tokens": args.max_tokens,
+        "temperature": args.temperature,
+        "top_p": args.top_p,
+        "n": args.n,
+        "presence_penalty": args.presence_penalty,
+        "frequency_penalty": args.frequency_penalty
+        });
+
+        let resp = self.client.post("https://api.openai.com/v1/chat/completions")
+        .headers(self.header.clone())
+        .json(&body)
+        .send()
+        .await?;
+
+        Ok(ChatResp { resp })
     }
 }

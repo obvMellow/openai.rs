@@ -1,6 +1,6 @@
 use openai_rs::{args::{ImageArgs, ImageSize}, response::Content, client::Client};
 use std::io::{stdin, stdout, Write};
-use std::fs;
+use std::env;
 
 #[tokio::main]
 async fn main() {
@@ -17,7 +17,7 @@ async fn main() {
 
     let args = ImageArgs::new(&prompt, Some(1), Some(ImageSize::Big), None);
 
-    let client = Client::new(fs::read_to_string("key.txt")
+    let client = Client::new(env::var("OPENAI_API_KEY")
         .unwrap()
         .as_str());
 

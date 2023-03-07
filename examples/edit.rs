@@ -1,6 +1,6 @@
 use openai_rs::{args::EditArgs, client::Client, response::Content};
 use std::io::{stdin, stdout, Write};
-use std::fs;
+use std::env;
 
 #[tokio::main]
 async fn main() {
@@ -28,7 +28,7 @@ async fn main() {
         None,
         None);
 
-    let client = Client::new(fs::read_to_string("key.txt")
+    let client = Client::new(env::var("OPENAI_API_KEY")
         .unwrap()
         .as_str());
 
