@@ -63,7 +63,7 @@ let response = &completion.resp;
 To see examples of other APIs [you can look at the examples here.](https://github.com/obvMellow/openai.rs/tree/main/examples)
 
 ## Features to come
--   Chat API support
+-   ~~Chat API support~~
 -   Embeddings API support
 -   Audio API support
 -   Fine tunes API support
