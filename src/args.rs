@@ -6,7 +6,7 @@ pub struct CompletionArgs {
     pub model: String,
     pub suffix: String,
     pub max_tokens: u32,
-    pub n: u32,
+    pub n: usize,
     pub temperature: f64,
 }
 
@@ -14,7 +14,7 @@ impl CompletionArgs {
     pub fn new(
         prompt: &str,
         max_tokens: Option<u32>,
-        n: Option<u32>,
+        n: Option<usize>,
         suffix: Option<&str>,
         temperature: Option<f64>,
     ) -> CompletionArgs {
@@ -34,7 +34,7 @@ pub struct EditArgs {
     pub model: String,
     pub input: String,
     pub instruction: String,
-    pub n: i32,
+    pub n: usize,
     pub temperature: f64,
     pub top_p: f64,
 }
@@ -44,7 +44,7 @@ impl EditArgs {
         model: Option<&str>,
         instruction: &str,
         input: &str,
-        n: Option<i32>,
+        n: Option<usize>,
         temperature: Option<f64>,
         top_p: Option<f64>,
     ) -> EditArgs {
@@ -70,7 +70,7 @@ impl std::fmt::Display for ImageSize {
         let str = match self {
             Self::Small => "256x256",
             Self::Medium => "512x512",
-            Self::Big => "1024x1024"
+            Self::Big => "1024x1024",
         };
 
         write!(f, "{}", str)
@@ -85,7 +85,7 @@ pub enum ImageResponseFormat {
 #[derive(Debug)]
 pub struct ImageArgs {
     pub prompt: String,
-    pub n: i32,
+    pub n: usize,
     pub size: String,
     pub response_format: String,
 }
@@ -93,7 +93,7 @@ pub struct ImageArgs {
 impl ImageArgs {
     pub fn new(
         prompt: &str,
-        n: Option<i32>,
+        n: Option<usize>,
         size: Option<ImageSize>,
         response_format: Option<ImageResponseFormat>,
     ) -> ImageArgs {
