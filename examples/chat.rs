@@ -1,4 +1,4 @@
-use openai_api_rs::{args::ChatArgs, client::Client, response::Content};
+use openai_gpt_rs::{args::ChatArgs, client::Client, response::Content};
 use std::io::{stdin, stdout, Write};
 use std::env;
 use std::collections::HashMap;
