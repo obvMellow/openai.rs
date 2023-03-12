@@ -1,4 +1,4 @@
-use openai_rs::{client::Client, args::CompletionArgs, response::Content};
+use openai_api_rs::{client::Client, args::CompletionArgs, response::Content};
 use std::io::{stdin, stdout, Write};
 use std::env;
 

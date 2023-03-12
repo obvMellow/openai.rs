@@ -1,4 +1,4 @@
-use openai_rs::{args::{ImageArgs, ImageSize}, response::Content, client::Client};
+use openai_api_rs::{args::{ImageArgs, ImageSize}, response::Content, client::Client};
 use std::io::{stdin, stdout, Write};
 use std::env;
 
