@@ -1,6 +1,6 @@
-use openai_gpt_rs::{client::Client, args::CompletionArgs, response::Content};
-use std::io::{stdin, stdout, Write};
+use openai_gpt_rs::{client::Client, response::Content};
 use std::env;
+use std::io::{stdin, stdout, Write};
 
 #[tokio::main]
 async fn main() {
@@ -9,23 +9,22 @@ async fn main() {
     print!("Enter a prompt: ");
     let _ = stdout().flush();
 
-    stdin()
-        .read_line(&mut prompt)
-        .unwrap();
+    stdin().read_line(&mut prompt).unwrap();
 
-    let args = CompletionArgs::new(&prompt, None, None, None, None);
+    let client = Client::new(env::var("OPENAI_API_KEY").unwrap().as_str());
 
-    let client = Client::new(env::var("OPENAI_API_KEY")
-        .unwrap()
-        .as_str());
-
-    let resp = client.create_completion(&args)
+    let resp = client
+        .create_completion(|args| {
+            args.prompt(prompt)
+                .model("text-davinci-003")
+                .max_tokens(32)
+                .n(1)
+                .temperature(1.0)
+        })
         .await
         .unwrap();
 
-    let completion = resp.get_content(0)
-        .await
-        .unwrap();
+    let completion = resp.get_content(0).await.unwrap();
 
     println!("{}", completion);
 }

@@ -1,6 +1,6 @@
-use openai_gpt_rs::{args::EditArgs, client::Client, response::Content};
-use std::io::{stdin, stdout, Write};
+use openai_gpt_rs::{client::Client, response::Content};
 use std::env;
+use std::io::{stdin, stdout, Write};
 
 #[tokio::main]
 async fn main() {
@@ -10,29 +10,25 @@ async fn main() {
     print!("Enter a prompt: ");
     let _ = stdout().flush();
 
-    stdin()
-        .read_line(&mut prompt)
-        .unwrap();
+    stdin().read_line(&mut prompt).unwrap();
 
     print!("Enter the instruction: ");
     let _ = stdout().flush();
 
-    stdin()
-        .read_line(&mut instruction)
+    stdin().read_line(&mut instruction).unwrap();
+
+    let client = Client::new(env::var("OPENAI_API_KEY").unwrap().as_str());
+
+    let resp = client
+        .create_edit(|args| {
+            args.input(prompt)
+                .instruction(instruction)
+                .model("text-davinci-003")
+                .n(1)
+                .temperature(1.0)
+        })
+        .await
         .unwrap();
-
-    let args = EditArgs::new(None,
-        &instruction,
-        &prompt,
-        None,
-        None,
-        None);
-
-    let client = Client::new(env::var("OPENAI_API_KEY")
-        .unwrap()
-        .as_str());
-
-    let resp = client.create_edit(&args).await.unwrap();
 
     let text = resp.get_content(0).await.unwrap();
 
