@@ -52,7 +52,9 @@ impl Client {
             .await;
 
         match resp {
-            Ok(val) => Ok(CompletionResp { resp: val }),
+            Ok(val) => Ok(CompletionResp {
+                json: val.json().await?,
+            }),
             Err(e) => Err(e),
         }
     }
@@ -83,7 +85,9 @@ impl Client {
             .await;
 
         match resp {
-            Ok(val) => Ok(EditResp { resp: val }),
+            Ok(val) => Ok(EditResp {
+                json: val.json().await?,
+            }),
             Err(e) => Err(e),
         }
     }
@@ -113,7 +117,9 @@ impl Client {
             .await;
 
         match resp {
-            Ok(val) => Ok(ImageResp { resp: val }),
+            Ok(val) => Ok(ImageResp {
+                json: val.json().await?,
+            }),
             Err(e) => Err(e),
         }
     }
@@ -147,15 +153,15 @@ impl Client {
         T: FnOnce(&mut ChatArgs) -> &mut ChatArgs,
     {
         let mut args = ChatArgs {
-                model: "gpt-3.5-turbo".to_string(),
-                messages: vec![],
-                n: 1,
-                temperature: 1.0,
-                top_p: 1.0,
-                max_tokens: 32,
-                presence_penalty: 0.0,
-                frequency_penalty: 0.0,
-            };
+            model: "gpt-3.5-turbo".to_string(),
+            messages: vec![],
+            n: 1,
+            temperature: 1.0,
+            top_p: 1.0,
+            max_tokens: 32,
+            presence_penalty: 0.0,
+            frequency_penalty: 0.0,
+        };
         arg(&mut args);
 
         let body = json!({
@@ -177,6 +183,8 @@ impl Client {
             .send()
             .await?;
 
-        Ok(ChatResp { resp })
+        Ok(ChatResp {
+            json: resp.json().await?,
+        })
     }
 }

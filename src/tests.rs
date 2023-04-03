@@ -137,37 +137,13 @@ async fn chat_completion() {
         Err(e) => panic!("An error occured while creating chat completion: {:?}", e),
     };
 
-    let json = resp.get_json().await.unwrap();
-
-    let content = json.as_object().unwrap().get("choices");
-
-    let content = match content {
-        Some(val) => val
-            .as_array()
-            .unwrap()
-            .get(0)
-            .unwrap()
-            .as_object()
-            .unwrap()
-            .get("message")
-            .unwrap()
-            .as_object()
-            .unwrap()
-            .get("content")
-            .unwrap()
-            .as_str()
-            .map(|s| s.to_string()),
-        None => panic!(
-            "An error occured while creating chat completion: {:?}",
-            json.as_object().unwrap()
-        ),
-    };
+    let content = resp.get_content(0).await;
 
     match content {
         Some(val) => assert!(!val.is_empty()),
         None => panic!(
             "Expected a String, got None for chat completion content! Response: {:?}",
-            json
+            resp.json
         ),
     }
 
