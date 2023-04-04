@@ -1,4 +1,5 @@
-#[doc = include_str!("../README.md")]
+pub use crate::client::Client;
+
 pub mod client;
 pub mod args;
 pub mod response;

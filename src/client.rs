@@ -12,6 +12,7 @@ pub struct Client {
 }
 
 impl Client {
+    /// Creates a new client with the given api key.
     pub fn new(key: &str) -> Client {
         let mut header = HeaderMap::new();
         header.insert(CONTENT_TYPE, "application/json".parse().unwrap());
@@ -25,6 +26,42 @@ impl Client {
     }
 
     /// Makes an api call to OpenAI Completion API and returns the response.
+    ///
+    /// # Arguments
+    ///
+    /// * `arg` - A closure that takes a mutable reference to `CompletionArgs` and returns it.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use openai_gpt_rs::{args::CompletionArgs, client::Client, response::{CompletionResp, Content}, models::CompletionModels};
+    /// use std::env;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let client = Client::new(env::var("OPENAI_API_KEY").unwrap().as_str());
+    ///
+    ///     let resp = client.create_completion(|args| {
+    ///                     args.prompt("This is a test")
+    ///                         .model(CompletionModels::TextDavinci3)
+    ///                         .max_tokens(32)
+    ///                         .n(5)
+    ///                })
+    ///            .await
+    ///           .unwrap();
+    ///
+    ///     let text = resp.get_contents(0..5);
+    ///
+    ///     for val in text {
+    ///        assert!(!val.is_empty());
+    ///    }
+    /// }
+    ///
+    /// ```
+    /// # Errors
+    /// This function will return an error if the api call fails.
+    /// The error will be of type `reqwest::Error`.
+    ///
     pub async fn create_completion<T>(&self, arg: T) -> Result<CompletionResp, Error>
     where
         T: FnOnce(&mut CompletionArgs) -> &mut CompletionArgs,
@@ -60,6 +97,37 @@ impl Client {
     }
 
     /// Makes an api call to OpenAI Edit API and returns the response.
+    /// # Arguments
+    /// * `arg` - A closure that takes a mutable reference to `EditArgs` and returns it.
+    /// # Example
+    /// ```
+    /// use openai_gpt_rs::{args::EditArgs, client::Client, response::{EditResp, Content}, models::EditModels};
+    /// use std::env;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let client = Client::new(env::var("OPENAI_API_KEY").unwrap().as_str());
+    ///
+    ///     let resp = client.create_edit(|args| {
+    ///                     args.model(EditModels::TextDavinciEdit1)
+    ///                         .input("How is you dae")
+    ///                         .instruction("Fix the spelling mistakes")
+    ///                         .n(5)
+    ///                 })
+    ///                .await
+    ///                .unwrap();
+    ///
+    ///     let text = resp.get_contents(0..5);
+    ///
+    ///     for val in text {
+    ///         assert!(!val.is_empty());
+    ///     }
+    /// }
+    /// ```
+    /// # Errors
+    /// This function will return an error if the api call fails.
+    /// The error will be of type `reqwest::Error`.
+    ///
     pub async fn create_edit<T>(&self, arg: T) -> Result<EditResp, Error>
     where
         T: FnOnce(&mut EditArgs) -> &mut EditArgs,
@@ -93,6 +161,36 @@ impl Client {
     }
 
     /// Makes an api call to OpenAI Image API and returns the response.
+    /// # Arguments
+    /// * `arg` - A closure that takes a mutable reference to `ImageArgs` and returns it.
+    /// # Example
+    /// ```
+    /// use openai_gpt_rs::{args::{ImageArgs, ImageSize}, client::Client, response::{ImageResp, Content}};
+    /// use std::env;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let client = Client::new(env::var("OPENAI_API_KEY").unwrap().as_str());
+    ///     
+    ///     let resp = client.create_image(|args| {
+    ///                         args.prompt("Kitty")
+    ///                             .size(ImageSize::Small)
+    ///                             .n(2)
+    ///                     })
+    ///                     .await
+    ///                     .unwrap();
+    ///
+    ///     let urls = resp.get_contents(0..2);
+    ///
+    ///     for val in urls {
+    ///         assert!(!val.is_empty());
+    ///     }
+    /// }
+    /// ```
+    /// # Errors
+    /// This function will return an error if the api call fails.
+    /// The error will be of type `reqwest::Error`.
+    ///
     pub async fn create_image<T>(&self, arg: T) -> Result<ImageResp, Error>
     where
         T: FnOnce(&mut ImageArgs) -> &mut ImageArgs,
@@ -124,7 +222,7 @@ impl Client {
         }
     }
 
-    /// Returns a reference to the client's api key.
+    /// Returns the client's api key.
     pub fn get_key(&self) -> &String {
         &self.api_key
     }
@@ -148,6 +246,49 @@ impl Client {
         Ok(resp)
     }
 
+    /// Makes an api call to OpenAI Chat Completion API and returns the response.
+    /// # Arguments
+    /// * `arg` - A closure that takes a mutable reference to `ChatArgs` and returns it.
+    /// # Example
+    /// ```
+    /// use openai_gpt_rs::{args::ChatArgs, client::Client, response::{ChatResp, Content}, models::ChatModels};
+    /// use std::env;
+    /// use std::collections::HashMap;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let client = Client::new(env::var("OPENAI_API_KEY").unwrap().as_str());
+    ///
+    ///     let mut message1: HashMap<String, String> = HashMap::new();
+    ///     message1.insert("role".to_string(), "user".to_string());
+    ///     message1.insert(
+    ///         "content".to_string(),
+    ///         "Who won the world series in 2020?".to_string(),
+    ///     );
+    ///
+    ///     let mut message2: HashMap<String, String> = HashMap::new();
+    ///     message2.insert("role".to_string(), "system".to_string());
+    ///     message2.insert(
+    ///         "content".to_string(),
+    ///         "You are a helpful assistant.".to_string(),
+    ///     );
+    ///
+    ///     let messages: Vec<HashMap<String, String>> = vec![message1, message2];
+    ///
+    ///     let resp = client
+    ///         .create_chat_completion(|args| args.messages(messages.clone()))
+    ///         .await
+    ///         .unwrap();
+    ///
+    ///     let contents = resp.get_content(0).unwrap();
+    ///
+    ///     assert!(!contents.is_empty());
+    /// }
+    /// ```
+    /// # Errors
+    /// This function will return an error if the api call fails.
+    /// The error will be of type `reqwest::Error`.
+    ///     
     pub async fn create_chat_completion<T>(&self, arg: T) -> Result<ChatResp, Error>
     where
         T: FnOnce(&mut ChatArgs) -> &mut ChatArgs,
