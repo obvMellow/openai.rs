@@ -1,6 +1,6 @@
 [package]
 name = "openai_gpt_rs"
-version = "0.3.1"
+version = "0.3.2"
 edition = "2021"
 description = "A wrapper for OpenAI API written in Rust"
 license = "MIT"
