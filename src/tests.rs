@@ -14,17 +14,16 @@ async fn completion() {
             args.prompt("Once upon a time")
                 .model(CompletionModels::TextDavinci3)
                 .max_tokens(32)
-                .n(1)
+                .n(5)
                 .temperature(1.0)
         })
         .await
         .unwrap();
 
-    let text = resp.get_content(0);
+    let text = resp.get_contents(0..5);
 
-    match text {
-        Some(val) => assert!(!val.is_empty()),
-        None => panic!("Expected a String, got None for completion text"),
+    for val in text {
+        assert!(!val.is_empty());
     }
 }
 
@@ -36,18 +35,17 @@ async fn edit() {
         .create_edit(|args| {
             args.input("What day of the week is it?")
                 .instruction("Fix spelling mistakes")
-                .n(1)
+                .n(5)
         })
         .await
         .unwrap();
 
     dbg!(&resp);
 
-    let text = resp.get_content(0);
+    let text = resp.get_contents(0..5);
 
-    match text {
-        Some(val) => assert!(!val.is_empty()),
-        None => panic!("Expected a String, got None for edit text!"),
+    for val in text {
+        assert!(!val.is_empty());
     }
 }
 
@@ -58,18 +56,17 @@ async fn image() {
     let resp = client
         .create_image(|args| {
             args.prompt("A realistic cat")
-                .n(1)
+                .n(3)
                 .size(ImageSize::Small)
                 .response_format(ImageResponseFormat::Url)
         })
         .await
         .unwrap();
 
-    let img = resp.get_content(0);
+    let img = resp.get_contents(0..3);
 
-    match img {
-        Some(val) => assert!(val.starts_with("https://")),
-        None => panic!("Expected a String, got None for image url!"),
+    for val in img {
+        assert!(!val.is_empty());
     }
 }
 
@@ -148,7 +145,7 @@ async fn chat_completion() {
     }
 
     let second = client
-        .create_chat_completion(|args| args.messages(messages))
+        .create_chat_completion(|args| args.messages(messages).n(3))
         .await;
 
     let second = match second {
@@ -156,7 +153,9 @@ async fn chat_completion() {
         Err(e) => panic!("An error occured while creating chat completion: {:?}", e),
     };
 
-    let content = second.get_content(0).unwrap();
+    let content = second.get_contents(0..3);
 
-    assert!(!content.is_empty());
+    for val in content {
+        assert!(!val.is_empty());
+    }
 }

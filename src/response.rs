@@ -3,6 +3,16 @@ use serde_json::Value;
 
 pub trait Content {
     fn get_content(&self, index: usize) -> Option<String>;
+
+    fn get_contents<I>(&self, indices: I) -> Vec<String>
+    where
+        I: IntoIterator<Item = usize>,
+    {
+        indices
+            .into_iter()
+            .filter_map(|i| self.get_content(i))
+            .collect()
+    }
 }
 
 #[derive(Debug)]
