@@ -156,16 +156,6 @@ impl std::fmt::Display for ImageSize {
     }
 }
 
-impl ImageSize {
-    pub fn to_string(&self) -> String {
-        match self {
-            Self::Small => "256x256".to_string(),
-            Self::Medium => "512x512".to_string(),
-            Self::Big => "1024x1024".to_string(),
-        }
-    }
-}
-
 pub enum ImageResponseFormat {
     Url,
     B64Json,
