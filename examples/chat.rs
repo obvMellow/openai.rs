@@ -47,7 +47,7 @@ async fn main() {
         .await
         .unwrap();
 
-    let content = resp.get_content(0).await.unwrap();
+    let content = resp.get_content(0).unwrap();
 
     println!("Response: {}", content);
 }

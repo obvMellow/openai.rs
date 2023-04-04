@@ -20,7 +20,7 @@ async fn completion() {
         .await
         .unwrap();
 
-    let text = resp.get_content(0).await;
+    let text = resp.get_content(0);
 
     match text {
         Some(val) => assert!(!val.is_empty()),
@@ -43,7 +43,7 @@ async fn edit() {
 
     dbg!(&resp);
 
-    let text = resp.get_content(0).await;
+    let text = resp.get_content(0);
 
     match text {
         Some(val) => assert!(!val.is_empty()),
@@ -65,7 +65,7 @@ async fn image() {
         .await
         .unwrap();
 
-    let img = resp.get_content(0).await;
+    let img = resp.get_content(0);
 
     match img {
         Some(val) => assert!(val.starts_with("https://")),
@@ -137,7 +137,7 @@ async fn chat_completion() {
         Err(e) => panic!("An error occured while creating chat completion: {:?}", e),
     };
 
-    let content = resp.get_content(0).await;
+    let content = resp.get_content(0);
 
     match content {
         Some(val) => assert!(!val.is_empty()),
@@ -156,7 +156,7 @@ async fn chat_completion() {
         Err(e) => panic!("An error occured while creating chat completion: {:?}", e),
     };
 
-    let content = second.get_content(0).await.unwrap();
+    let content = second.get_content(0).unwrap();
 
     assert!(!content.is_empty());
 }

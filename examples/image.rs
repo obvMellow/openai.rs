@@ -20,7 +20,7 @@ async fn main() {
         .await
         .unwrap();
 
-    let url = resp.get_content(0).await.unwrap();
+    let url = resp.get_content(0).unwrap();
 
     println!("Url: {}", url);
 }

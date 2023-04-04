@@ -1,9 +1,8 @@
 use async_trait::async_trait;
 use serde_json::Value;
 
-#[async_trait]
 pub trait Content {
-    async fn get_content(&self, index: usize) -> Option<String>;
+    fn get_content(&self, index: usize) -> Option<String>;
 }
 
 #[derive(Debug)]
@@ -28,7 +27,7 @@ pub struct ChatResp {
 
 #[async_trait]
 impl Content for CompletionResp {
-    async fn get_content(&self, index: usize) -> Option<String> {
+    fn get_content(&self, index: usize) -> Option<String> {
         let content = self
             .json
             .as_object()?
@@ -44,7 +43,7 @@ impl Content for CompletionResp {
 
 #[async_trait]
 impl Content for EditResp {
-    async fn get_content(&self, index: usize) -> Option<String> {
+    fn get_content(&self, index: usize) -> Option<String> {
         let content = self
             .json
             .as_object()?
@@ -60,7 +59,7 @@ impl Content for EditResp {
 
 #[async_trait]
 impl Content for ImageResp {
-    async fn get_content(&self, index: usize) -> Option<String> {
+    fn get_content(&self, index: usize) -> Option<String> {
         let content = self
             .json
             .as_object()?
@@ -76,7 +75,7 @@ impl Content for ImageResp {
 
 #[async_trait]
 impl Content for ChatResp {
-    async fn get_content(&self, index: usize) -> Option<String> {
+    fn get_content(&self, index: usize) -> Option<String> {
         let content = self
             .json
             .as_object()?

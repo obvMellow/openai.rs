@@ -25,7 +25,7 @@ async fn main() {
         .await
         .unwrap();
 
-    let completion = resp.get_content(0).await.unwrap();
+    let completion = resp.get_content(0).unwrap();
 
     println!("{}", completion);
 }
