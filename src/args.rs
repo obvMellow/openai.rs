@@ -10,9 +10,9 @@ pub struct CompletionArgs {
     pub temperature: f64,
 }
 
-impl CompletionArgs {
+impl Default for CompletionArgs {
     /// Create a new CompletionArgs struct with default values
-    pub fn default() -> Self {
+    fn default() -> Self {
         Self {
             prompt: "".to_string(),
             model: "text-davinci-003".to_string(),
@@ -22,7 +22,9 @@ impl CompletionArgs {
             temperature: 1.0,
         }
     }
+}
 
+impl CompletionArgs {
     /// Set the prompt for the completion
     pub fn prompt<T>(&mut self, prompt: T) -> &mut Self
     where
@@ -79,9 +81,9 @@ pub struct EditArgs {
     pub top_p: f64,
 }
 
-impl EditArgs {
+impl Default for EditArgs {
     /// Create a new EditArgs struct with default values
-    pub fn default() -> Self {
+    fn default() -> Self {
         Self {
             model: "text-davinci-edit-001".to_string(),
             input: "".to_string(),
@@ -91,7 +93,9 @@ impl EditArgs {
             top_p: 1.0,
         }
     }
+}
 
+impl EditArgs {
     /// Set the model to use for the edit
     pub fn model<T>(&mut self, model: T) -> &mut Self
     where
@@ -178,9 +182,9 @@ pub struct ImageArgs {
     pub response_format: String,
 }
 
-impl ImageArgs {
+impl Default for ImageArgs {
     /// Create a new ImageArgs struct with default values
-    pub fn default() -> Self {
+    fn default() -> Self {
         Self {
             prompt: "".to_string(),
             n: 1,
@@ -188,7 +192,9 @@ impl ImageArgs {
             response_format: ImageResponseFormat::Url.to_string(),
         }
     }
+}
 
+impl ImageArgs {
     /// Set the prompt for the image
     pub fn prompt<T>(&mut self, prompt: T) -> &mut Self
     where
@@ -229,9 +235,9 @@ pub struct ChatArgs {
     pub frequency_penalty: f64,
 }
 
-impl ChatArgs {
+impl Default for ChatArgs {
     /// Default chat arguments
-    pub fn default() -> Self {
+    fn default() -> Self {
         Self {
             model: "gpt-3.5-turbo".to_string(),
             messages: vec![],
@@ -243,7 +249,9 @@ impl ChatArgs {
             frequency_penalty: 0.0,
         }
     }
+}
 
+impl ChatArgs {
     /// Set the model to use
     pub fn model<T>(&mut self, model: T) -> &mut Self
     where
