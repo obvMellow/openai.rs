@@ -165,12 +165,14 @@ pub enum ImageResponseFormat {
     B64Json,
 }
 
-impl ImageResponseFormat {
-    pub fn to_string(&self) -> String {
-        match self {
-            Self::Url => "url".to_string(),
-            Self::B64Json => "b64json".to_string(),
-        }
+impl std::fmt::Display for ImageResponseFormat {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let str = match self {
+            Self::Url => "url",
+            Self::B64Json => "b64json",
+        };
+
+        write!(f, "{}", str)
     }
 }
 
