@@ -1,3 +1,4 @@
+use openai_gpt_rs::models::EditModels;
 use openai_gpt_rs::{client::Client, response::Content};
 use std::env;
 use std::io::{stdin, stdout, Write};
@@ -23,7 +24,7 @@ async fn main() {
         .create_edit(|args| {
             args.input(prompt)
                 .instruction(instruction)
-                .model("text-davinci-003")
+                .model(EditModels::TextDavinciEdit1)
                 .n(1)
                 .temperature(1.0)
         })

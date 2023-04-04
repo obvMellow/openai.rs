@@ -1,5 +1,6 @@
 use crate::args::*;
 use crate::client::Client;
+use crate::models::CompletionModels;
 use crate::response::*;
 use std::collections::HashMap;
 use std::env;
@@ -11,7 +12,7 @@ async fn completion() {
     let resp = client
         .create_completion(|args| {
             args.prompt("Once upon a time")
-                .model("text-davinci-003")
+                .model(CompletionModels::TextDavinci3)
                 .max_tokens(32)
                 .n(1)
                 .temperature(1.0)
@@ -36,7 +37,6 @@ async fn edit() {
             args.input("What day of the week is it?")
                 .instruction("Fix spelling mistakes")
                 .n(1)
-                .temperature(1.0)
         })
         .await
         .unwrap();

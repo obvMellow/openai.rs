@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use crate::models::{ChatModels, CompletionModels, EditModels};
+
 #[derive(Debug)]
 pub struct CompletionArgs {
     pub prompt: String,
@@ -35,10 +37,7 @@ impl CompletionArgs {
     }
 
     /// Set the model to use for the completion
-    pub fn model<T>(&mut self, model: T) -> &mut Self
-    where
-        T: ToString,
-    {
+    pub fn model(&mut self, model: CompletionModels) -> &mut Self {
         self.model = model.to_string();
         self
     }
@@ -97,10 +96,7 @@ impl Default for EditArgs {
 
 impl EditArgs {
     /// Set the model to use for the edit
-    pub fn model<T>(&mut self, model: T) -> &mut Self
-    where
-        T: ToString,
-    {
+    pub fn model(&mut self, model: EditModels) -> &mut Self {
         self.model = model.to_string();
         self
     }
@@ -255,10 +251,7 @@ impl Default for ChatArgs {
 
 impl ChatArgs {
     /// Set the model to use
-    pub fn model<T>(&mut self, model: T) -> &mut Self
-    where
-        T: ToString,
-    {
+    pub fn model(&mut self, model: ChatModels) -> &mut Self {
         self.model = model.to_string();
         self
     }
