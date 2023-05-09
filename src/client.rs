@@ -30,7 +30,7 @@ impl Client {
     ///
     /// # Arguments
     ///
-    /// * `arg` - A closure that takes a mutable reference to `CompletionArgs` and returns it.
+    /// * `f` - A closure that takes a mutable reference to `CompletionArgs` and returns it.
     ///
     /// # Example
     ///
@@ -100,8 +100,11 @@ impl Client {
     }
 
     /// Makes an api call to OpenAI Edit API and returns the response.
+    /// 
     /// # Arguments
-    /// * `arg` - A closure that takes a mutable reference to `EditArgs` and returns it.
+    /// 
+    /// * `f` - A closure that takes a mutable reference to `EditArgs` and returns it.
+    /// 
     /// # Example
     /// ```
     /// use openai_gpt_rs::{args::EditArgs, client::Client, response::{EditResp, Content}, models::EditModels};
@@ -165,8 +168,11 @@ impl Client {
     }
 
     /// Makes an api call to OpenAI Image API and returns the response.
+    /// 
     /// # Arguments
-    /// * `arg` - A closure that takes a mutable reference to `ImageArgs` and returns it.
+    /// 
+    /// * `f` - A closure that takes a mutable reference to `ImageArgs` and returns it.
+    /// 
     /// # Example
     /// ```
     /// use openai_gpt_rs::{args::{ImageArgs, ImageSize}, client::Client, response::{ImageResp, Content}};
@@ -252,8 +258,11 @@ impl Client {
     }
 
     /// Makes an api call to OpenAI Chat Completion API and returns the response.
+    /// 
     /// # Arguments
-    /// * `arg` - A closure that takes a mutable reference to `ChatArgs` and returns it.
+    /// 
+    /// * `f` - A closure that takes a mutable reference to `ChatArgs` and returns it.
+    /// 
     /// # Example
     /// ```
     /// use openai_gpt_rs::{args::ChatArgs, client::Client, response::{ChatResp, Content}, models::ChatModels};
