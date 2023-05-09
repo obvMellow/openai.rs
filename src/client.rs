@@ -265,7 +265,7 @@ impl Client {
     ///
     /// # Example
     /// ```
-    /// use openai_gpt_rs::{args::ChatArgs, client::Client, response::{ChatResp, Content}, models::ChatModels};
+    /// use openai_gpt_rs::{args::ChatArgs, client::Client, response::{ChatResp, Content}, models::ChatModels, chat::Message};
     /// use std::env;
     /// use std::collections::HashMap;
     ///
@@ -273,21 +273,17 @@ impl Client {
     /// async fn main() {
     ///     let client = Client::new(env::var("OPENAI_API_KEY").unwrap().as_str());
     ///
-    ///     let mut message1: HashMap<String, String> = HashMap::new();
-    ///     message1.insert("role".to_string(), "user".to_string());
-    ///     message1.insert(
-    ///         "content".to_string(),
-    ///         "Who won the world series in 2020?".to_string(),
-    ///     );
+    ///     let message1 = Message {
+    ///         role: "user".to_string(),
+    ///         content: "Who won the world series in 2020?".to_string(),
+    ///     };
     ///
-    ///     let mut message2: HashMap<String, String> = HashMap::new();
-    ///     message2.insert("role".to_string(), "system".to_string());
-    ///     message2.insert(
-    ///         "content".to_string(),
-    ///         "You are a helpful assistant.".to_string(),
-    ///     );
+    ///     let message2 = Message {
+    ///         role: "system".to_string(),
+    ///         content: "You are a helpful assistant.".to_string(),
+    ///     };
     ///
-    ///     let messages: Vec<HashMap<String, String>> = vec![message1, message2];
+    ///     let messages = vec![message1, message2];
     ///
     ///     let resp = client
     ///         .create_chat_completion(|args| args.messages(messages.clone()))
