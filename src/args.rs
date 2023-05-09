@@ -1,6 +1,7 @@
-use std::collections::HashMap;
-
-use crate::{models::{ChatModels, CompletionModels, EditModels}, chat::Message};
+use crate::{
+    chat::Message,
+    models::{ChatModels, CompletionModels, EditModels},
+};
 
 #[derive(Debug)]
 pub struct CompletionArgs {

@@ -1,8 +1,8 @@
 use crate::args::*;
+use crate::chat::Message;
 use crate::client::Client;
 use crate::models::CompletionModels;
 use crate::response::*;
-use std::collections::HashMap;
 use std::env;
 
 #[tokio::test]
@@ -109,49 +109,37 @@ fn set_key() {
 async fn chat_completion() {
     let client = Client::new(env::var("OPENAI_API_KEY").unwrap().as_str());
 
-    let mut message1: HashMap<String, String> = HashMap::new();
-    message1.insert("role".to_string(), "user".to_string());
-    message1.insert(
-        "content".to_string(),
-        "Who won the world series in 2020?".to_string(),
-    );
+    let message1 = Message {
+        role: "user".to_string(),
+        content: "Who won the world series in 2020?".to_string(),
+    };
 
-    let mut message2: HashMap<String, String> = HashMap::new();
-    message2.insert("role".to_string(), "system".to_string());
-    message2.insert(
-        "content".to_string(),
-        "You are a helpful assistant.".to_string(),
-    );
+    let message2 = Message {
+        role: "system".to_string(),
+        content: "You are a helpful assistant.".to_string(),
+    };
 
-    let messages: Vec<HashMap<String, String>> = vec![message1, message2];
+    let messages = vec![message1, message2];
 
     let resp = client
         .create_chat_completion(|args| args.messages(messages.clone()))
-        .await;
+        .await
+        .expect("An error occured while creating chat completion");
 
-    let resp = match resp {
-        Ok(val) => val,
-        Err(e) => panic!("An error occured while creating chat completion: {:?}", e),
-    };
-
-    let content = resp.get_content(0);
-
-    match content {
-        Some(val) => assert!(!val.is_empty()),
-        None => panic!(
+    let content = resp.get_content(0).expect(
+        format!(
             "Expected a String, got None for chat completion content! Response: {:?}",
-            resp.json
-        ),
-    }
+            resp
+        )
+        .as_str(),
+    );
+
+    assert!(!content.is_empty());
 
     let second = client
         .create_chat_completion(|args| args.messages(messages).n(3))
-        .await;
-
-    let second = match second {
-        Ok(val) => val,
-        Err(e) => panic!("An error occured while creating chat completion: {:?}", e),
-    };
+        .await
+        .expect("An error occured while creating chat completion");
 
     let content = second.get_contents(0..3);
 

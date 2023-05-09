@@ -1,5 +1,5 @@
+use openai_gpt_rs::chat::Message;
 use openai_gpt_rs::{client::Client, response::Content};
-use std::collections::HashMap;
 use std::env;
 use std::io::{stdin, stdout, Write};
 
@@ -34,16 +34,14 @@ async fn main() {
 
     stdin().read_line(&mut message).unwrap();
 
-    let message = message.trim().to_string();
+    let content = message.trim().to_string();
 
-    let mut messages = HashMap::new();
-    messages.insert("role".to_string(), role);
-    messages.insert("content".to_string(), message);
+    let message = Message { role, content };
 
-    let messages: Vec<HashMap<String, String>> = vec![messages];
+    let message = vec![message];
 
     let resp = client
-        .create_chat_completion(|args| args.messages(messages))
+        .create_chat_completion(|args| args.messages(message))
         .await
         .unwrap();
 
