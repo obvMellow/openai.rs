@@ -7,3 +7,9 @@ pub struct CompletionChoice {
     pub logprobs: Option<u8>,
     pub finish_reason: Option<String>,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct EditChoice {
+    pub text: String,
+    pub index: usize,
+}

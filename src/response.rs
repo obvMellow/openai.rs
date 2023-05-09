@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::choice::CompletionChoice;
+use crate::choice::*;
 use crate::usage::Usage;
 
 pub trait Content {
@@ -29,9 +29,12 @@ pub struct CompletionResp {
     pub usage: Usage,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct EditResp {
-    pub json: Value,
+    pub object: String,
+    pub created: u64,
+    pub choices: Vec<EditChoice>,
+    pub usage: Usage,
 }
 
 #[derive(Debug)]
@@ -55,16 +58,8 @@ impl Content for CompletionResp {
 #[async_trait]
 impl Content for EditResp {
     fn get_content(&self, index: usize) -> Option<String> {
-        let content = self
-            .json
-            .as_object()?
-            .get("choices")?
-            .as_array()?
-            .get(index)?
-            .as_object()?
-            .get("text")?
-            .as_str();
-        content.map(|s| s.to_string())
+        let content = self.choices.get(index)?.text.clone();
+        Some(content)
     }
 }
 
