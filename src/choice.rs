@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::chat::Message;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CompletionChoice {
     pub text: String,
@@ -17,4 +19,11 @@ pub struct EditChoice {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ImageData {
     pub url: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ChatChoice {
+    pub index: usize,
+    pub message: Message,
+    pub finish_reason: String,
 }

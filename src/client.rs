@@ -100,11 +100,11 @@ impl Client {
     }
 
     /// Makes an api call to OpenAI Edit API and returns the response.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `f` - A closure that takes a mutable reference to `EditArgs` and returns it.
-    /// 
+    ///
     /// # Example
     /// ```
     /// use openai_gpt_rs::{args::EditArgs, client::Client, response::{EditResp, Content}, models::EditModels};
@@ -168,11 +168,11 @@ impl Client {
     }
 
     /// Makes an api call to OpenAI Image API and returns the response.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `f` - A closure that takes a mutable reference to `ImageArgs` and returns it.
-    /// 
+    ///
     /// # Example
     /// ```
     /// use openai_gpt_rs::{args::{ImageArgs, ImageSize}, client::Client, response::{ImageResp, Content}};
@@ -258,11 +258,11 @@ impl Client {
     }
 
     /// Makes an api call to OpenAI Chat Completion API and returns the response.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `f` - A closure that takes a mutable reference to `ChatArgs` and returns it.
-    /// 
+    ///
     /// # Example
     /// ```
     /// use openai_gpt_rs::{args::ChatArgs, client::Client, response::{ChatResp, Content}, models::ChatModels};
@@ -303,7 +303,7 @@ impl Client {
     /// This function will return an error if the api call fails.
     /// The error will be of type `reqwest::Error`.
     ///     
-    pub async fn create_chat_completion<T>(&self, f: T) -> Result<ChatResp, Error>
+    pub async fn create_chat_completion<T>(&self, f: T) -> Result<ChatResp, ResponseError>
     where
         T: FnOnce(&mut ChatArgs) -> &mut ChatArgs,
     {
@@ -336,10 +336,15 @@ impl Client {
             .headers(self.header.clone())
             .json(&body)
             .send()
-            .await?;
+            .await
+            .unwrap();
 
-        Ok(ChatResp {
-            json: resp.json().await?,
-        })
+        let json: Value = resp.json().await.unwrap();
+
+        if let Some(e) = json.as_object().unwrap().get("error") {
+            return Err(serde_json::from_value(e.clone()).unwrap());
+        }
+
+        Ok(serde_json::from_value(json).unwrap())
     }
 }

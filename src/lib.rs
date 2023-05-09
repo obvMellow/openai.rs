@@ -7,6 +7,7 @@ pub mod models;
 pub mod error;
 pub mod choice;
 pub mod usage;
+pub mod chat;
 
 #[cfg(test)]
 mod tests;

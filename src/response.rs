@@ -1,6 +1,5 @@
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 
 use crate::choice::*;
 use crate::usage::Usage;
@@ -43,9 +42,13 @@ pub struct ImageResp {
     pub data: Vec<ImageData>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct ChatResp {
-    pub json: Value,
+    pub id: String,
+    pub object: String,
+    pub created: u64,
+    pub choices: Vec<ChatChoice>,
+    pub usage: Usage,
 }
 
 #[async_trait]
@@ -75,17 +78,7 @@ impl Content for ImageResp {
 #[async_trait]
 impl Content for ChatResp {
     fn get_content(&self, index: usize) -> Option<String> {
-        let content = self
-            .json
-            .as_object()?
-            .get("choices")?
-            .as_array()?
-            .get(index)?
-            .as_object()?
-            .get("message")?
-            .as_object()?
-            .get("content")?
-            .as_str();
-        content.map(|s| s.to_string())
+        let content = self.choices.get(index)?.message.content.clone();
+        Some(content)
     }
 }
