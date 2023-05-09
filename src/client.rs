@@ -191,11 +191,10 @@ impl Client {
     ///     }
     /// }
     /// ```
-    /// # Errors
-    /// This function will return an error if the api call fails.
-    /// The error will be of type `reqwest::Error`.
+    /// # Panics
+    /// This function will panic if the request to OpenAI fails.
     ///
-    pub async fn create_image<T>(&self, f: T) -> Result<ImageResp, Error>
+    pub async fn create_image<T>(&self, f: T) -> Result<ImageResp, ResponseError>
     where
         T: FnOnce(&mut ImageArgs) -> &mut ImageArgs,
     {
@@ -216,14 +215,16 @@ impl Client {
             .headers(self.header.clone())
             .body(body.to_string())
             .send()
-            .await;
+            .await
+            .unwrap();
 
-        match resp {
-            Ok(val) => Ok(ImageResp {
-                json: val.json().await?,
-            }),
-            Err(e) => Err(e),
+        let json: Value = resp.json().await.unwrap();
+
+        if let Some(e) = json.as_object().unwrap().get("error") {
+            return Err(serde_json::from_value(e.clone()).unwrap());
         }
+
+        Ok(serde_json::from_value(json).unwrap())
     }
 
     /// Returns the client's api key.

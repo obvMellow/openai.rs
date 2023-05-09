@@ -37,9 +37,10 @@ pub struct EditResp {
     pub usage: Usage,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct ImageResp {
-    pub json: Value,
+    pub created: u64,
+    pub data: Vec<ImageData>,
 }
 
 #[derive(Debug)]
@@ -66,16 +67,8 @@ impl Content for EditResp {
 #[async_trait]
 impl Content for ImageResp {
     fn get_content(&self, index: usize) -> Option<String> {
-        let content = self
-            .json
-            .as_object()?
-            .get("data")?
-            .as_array()?
-            .get(index)?
-            .as_object()?
-            .get("url")?
-            .as_str();
-        content.map(|s| s.to_string())
+        let content = self.data.get(index)?.url.clone();
+        Some(content)
     }
 }
 

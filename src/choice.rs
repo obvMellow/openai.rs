@@ -13,3 +13,8 @@ pub struct EditChoice {
     pub text: String,
     pub index: usize,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ImageData {
+    pub url: String,
+}
