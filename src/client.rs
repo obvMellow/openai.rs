@@ -63,12 +63,12 @@ impl Client {
     /// # Panics
     /// This function will panic if the request to OpenAI fails.
     ///
-    pub async fn create_completion<T>(&self, arg: T) -> Result<CompletionResp, ResponseError>
+    pub async fn create_completion<T>(&self, f: T) -> Result<CompletionResp, ResponseError>
     where
         T: FnOnce(&mut CompletionArgs) -> &mut CompletionArgs,
     {
         let mut args = CompletionArgs::default();
-        arg(&mut args);
+        f(&mut args);
 
         let body: Value = json!({
             "model": args.model,
@@ -131,12 +131,12 @@ impl Client {
     /// This function will return an error if the api call fails.
     /// The error will be of type `reqwest::Error`.
     ///
-    pub async fn create_edit<T>(&self, arg: T) -> Result<EditResp, Error>
+    pub async fn create_edit<T>(&self, f: T) -> Result<EditResp, Error>
     where
         T: FnOnce(&mut EditArgs) -> &mut EditArgs,
     {
         let mut args = EditArgs::default();
-        arg(&mut args);
+        f(&mut args);
 
         let body = json!({
             "model": args.model,
@@ -194,12 +194,12 @@ impl Client {
     /// This function will return an error if the api call fails.
     /// The error will be of type `reqwest::Error`.
     ///
-    pub async fn create_image<T>(&self, arg: T) -> Result<ImageResp, Error>
+    pub async fn create_image<T>(&self, f: T) -> Result<ImageResp, Error>
     where
         T: FnOnce(&mut ImageArgs) -> &mut ImageArgs,
     {
         let mut args = ImageArgs::default();
-        arg(&mut args);
+        f(&mut args);
 
         let body = json!({
             "model": "image-alpha-001",
@@ -292,7 +292,7 @@ impl Client {
     /// This function will return an error if the api call fails.
     /// The error will be of type `reqwest::Error`.
     ///     
-    pub async fn create_chat_completion<T>(&self, arg: T) -> Result<ChatResp, Error>
+    pub async fn create_chat_completion<T>(&self, f: T) -> Result<ChatResp, Error>
     where
         T: FnOnce(&mut ChatArgs) -> &mut ChatArgs,
     {
@@ -306,7 +306,7 @@ impl Client {
             presence_penalty: 0.0,
             frequency_penalty: 0.0,
         };
-        arg(&mut args);
+        f(&mut args);
 
         let body = json!({
         "model": args.model,
