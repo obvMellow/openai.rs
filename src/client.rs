@@ -1,4 +1,5 @@
 use crate::args::*;
+use crate::error::ResponseError;
 use crate::response::*;
 use reqwest::header::{HeaderMap, AUTHORIZATION, CONTENT_TYPE};
 use reqwest::Client as HttpClient;
@@ -58,11 +59,11 @@ impl Client {
     /// }
     ///
     /// ```
-    /// # Errors
-    /// This function will return an error if the api call fails.
-    /// The error will be of type `reqwest::Error`.
     ///
-    pub async fn create_completion<T>(&self, arg: T) -> Result<CompletionResp, Error>
+    /// # Panics
+    /// This function will panic if the request to OpenAI fails.
+    ///
+    pub async fn create_completion<T>(&self, arg: T) -> Result<CompletionResp, ResponseError>
     where
         T: FnOnce(&mut CompletionArgs) -> &mut CompletionArgs,
     {
@@ -86,14 +87,16 @@ impl Client {
             .headers(self.header.clone())
             .json(&body)
             .send()
-            .await;
+            .await
+            .unwrap();
 
-        match resp {
-            Ok(val) => Ok(CompletionResp {
-                json: val.json().await?,
-            }),
-            Err(e) => Err(e),
+        let json: Value = resp.json().await.unwrap();
+
+        if let Some(e) = json.as_object().unwrap().get("error") {
+            return Err(serde_json::from_value(e.clone()).unwrap());
         }
+
+        Ok(serde_json::from_value(json).unwrap())
     }
 
     /// Makes an api call to OpenAI Edit API and returns the response.

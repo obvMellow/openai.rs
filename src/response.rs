@@ -1,5 +1,9 @@
 use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
+
+use crate::choice::CompletionChoice;
+use crate::usage::Usage;
 
 pub trait Content {
     fn get_content(&self, index: usize) -> Option<String>;
@@ -15,9 +19,14 @@ pub trait Content {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct CompletionResp {
-    pub json: Value,
+    pub id: String,
+    pub object: String,
+    pub created: u64,
+    pub model: String,
+    pub choices: Vec<CompletionChoice>,
+    pub usage: Usage,
 }
 
 #[derive(Debug)]
@@ -38,16 +47,8 @@ pub struct ChatResp {
 #[async_trait]
 impl Content for CompletionResp {
     fn get_content(&self, index: usize) -> Option<String> {
-        let content = self
-            .json
-            .as_object()?
-            .get("choices")?
-            .as_array()?
-            .get(index)?
-            .as_object()?
-            .get("text")?
-            .as_str();
-        content.map(|s| s.to_string())
+        let content = self.choices.get(index)?.text.clone();
+        Some(content)
     }
 }
 
