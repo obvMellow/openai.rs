@@ -1,6 +1,7 @@
-use std::collections::HashMap;
-
-use crate::models::{ChatModels, CompletionModels, EditModels};
+use crate::{
+    chat::Message,
+    models::{ChatModels, CompletionModels, EditModels},
+};
 
 #[derive(Debug)]
 pub struct CompletionArgs {
@@ -224,7 +225,7 @@ impl ImageArgs {
 #[derive(Debug)]
 pub struct ChatArgs {
     pub model: String,
-    pub messages: Vec<HashMap<String, String>>,
+    pub messages: Vec<Message>,
     pub n: i32,
     pub temperature: f64,
     pub top_p: f64,
@@ -257,7 +258,7 @@ impl ChatArgs {
     }
 
     /// Set the messages to use
-    pub fn messages(&mut self, messages: Vec<HashMap<String, String>>) -> &mut Self {
+    pub fn messages(&mut self, messages: Vec<Message>) -> &mut Self {
         self.messages = messages;
         self
     }

@@ -1,4 +1,5 @@
 use crate::args::*;
+use crate::error::ResponseError;
 use crate::response::*;
 use reqwest::header::{HeaderMap, AUTHORIZATION, CONTENT_TYPE};
 use reqwest::Client as HttpClient;
@@ -29,7 +30,7 @@ impl Client {
     ///
     /// # Arguments
     ///
-    /// * `arg` - A closure that takes a mutable reference to `CompletionArgs` and returns it.
+    /// * `f` - A closure that takes a mutable reference to `CompletionArgs` and returns it.
     ///
     /// # Example
     ///
@@ -58,16 +59,16 @@ impl Client {
     /// }
     ///
     /// ```
-    /// # Errors
-    /// This function will return an error if the api call fails.
-    /// The error will be of type `reqwest::Error`.
     ///
-    pub async fn create_completion<T>(&self, arg: T) -> Result<CompletionResp, Error>
+    /// # Panics
+    /// This function will panic if the request to OpenAI fails.
+    ///
+    pub async fn create_completion<T>(&self, f: T) -> Result<CompletionResp, ResponseError>
     where
         T: FnOnce(&mut CompletionArgs) -> &mut CompletionArgs,
     {
         let mut args = CompletionArgs::default();
-        arg(&mut args);
+        f(&mut args);
 
         let body: Value = json!({
             "model": args.model,
@@ -86,19 +87,24 @@ impl Client {
             .headers(self.header.clone())
             .json(&body)
             .send()
-            .await;
+            .await
+            .unwrap();
 
-        match resp {
-            Ok(val) => Ok(CompletionResp {
-                json: val.json().await?,
-            }),
-            Err(e) => Err(e),
+        let json: Value = resp.json().await.unwrap();
+
+        if let Some(e) = json.as_object().unwrap().get("error") {
+            return Err(serde_json::from_value(e.clone()).unwrap());
         }
+
+        Ok(serde_json::from_value(json).unwrap())
     }
 
     /// Makes an api call to OpenAI Edit API and returns the response.
+    ///
     /// # Arguments
-    /// * `arg` - A closure that takes a mutable reference to `EditArgs` and returns it.
+    ///
+    /// * `f` - A closure that takes a mutable reference to `EditArgs` and returns it.
+    ///
     /// # Example
     /// ```
     /// use openai_gpt_rs::{args::EditArgs, client::Client, response::{EditResp, Content}, models::EditModels};
@@ -124,16 +130,15 @@ impl Client {
     ///     }
     /// }
     /// ```
-    /// # Errors
-    /// This function will return an error if the api call fails.
-    /// The error will be of type `reqwest::Error`.
+    /// # Panics
+    /// This function will panic if the request to OpenAI fails.
     ///
-    pub async fn create_edit<T>(&self, arg: T) -> Result<EditResp, Error>
+    pub async fn create_edit<T>(&self, f: T) -> Result<EditResp, ResponseError>
     where
         T: FnOnce(&mut EditArgs) -> &mut EditArgs,
     {
         let mut args = EditArgs::default();
-        arg(&mut args);
+        f(&mut args);
 
         let body = json!({
             "model": args.model,
@@ -150,19 +155,24 @@ impl Client {
             .headers(self.header.clone())
             .body(body.to_string())
             .send()
-            .await;
+            .await
+            .unwrap();
 
-        match resp {
-            Ok(val) => Ok(EditResp {
-                json: val.json().await?,
-            }),
-            Err(e) => Err(e),
+        let json: Value = resp.json().await.unwrap();
+
+        if let Some(e) = json.as_object().unwrap().get("error") {
+            return Err(serde_json::from_value(e.clone()).unwrap());
         }
+
+        Ok(serde_json::from_value(json).unwrap())
     }
 
     /// Makes an api call to OpenAI Image API and returns the response.
+    ///
     /// # Arguments
-    /// * `arg` - A closure that takes a mutable reference to `ImageArgs` and returns it.
+    ///
+    /// * `f` - A closure that takes a mutable reference to `ImageArgs` and returns it.
+    ///
     /// # Example
     /// ```
     /// use openai_gpt_rs::{args::{ImageArgs, ImageSize}, client::Client, response::{ImageResp, Content}};
@@ -187,16 +197,15 @@ impl Client {
     ///     }
     /// }
     /// ```
-    /// # Errors
-    /// This function will return an error if the api call fails.
-    /// The error will be of type `reqwest::Error`.
+    /// # Panics
+    /// This function will panic if the request to OpenAI fails.
     ///
-    pub async fn create_image<T>(&self, arg: T) -> Result<ImageResp, Error>
+    pub async fn create_image<T>(&self, f: T) -> Result<ImageResp, ResponseError>
     where
         T: FnOnce(&mut ImageArgs) -> &mut ImageArgs,
     {
         let mut args = ImageArgs::default();
-        arg(&mut args);
+        f(&mut args);
 
         let body = json!({
             "model": "image-alpha-001",
@@ -212,14 +221,16 @@ impl Client {
             .headers(self.header.clone())
             .body(body.to_string())
             .send()
-            .await;
+            .await
+            .unwrap();
 
-        match resp {
-            Ok(val) => Ok(ImageResp {
-                json: val.json().await?,
-            }),
-            Err(e) => Err(e),
+        let json: Value = resp.json().await.unwrap();
+
+        if let Some(e) = json.as_object().unwrap().get("error") {
+            return Err(serde_json::from_value(e.clone()).unwrap());
         }
+
+        Ok(serde_json::from_value(json).unwrap())
     }
 
     /// Returns the client's api key.
@@ -247,11 +258,14 @@ impl Client {
     }
 
     /// Makes an api call to OpenAI Chat Completion API and returns the response.
+    ///
     /// # Arguments
-    /// * `arg` - A closure that takes a mutable reference to `ChatArgs` and returns it.
+    ///
+    /// * `f` - A closure that takes a mutable reference to `ChatArgs` and returns it.
+    ///
     /// # Example
     /// ```
-    /// use openai_gpt_rs::{args::ChatArgs, client::Client, response::{ChatResp, Content}, models::ChatModels};
+    /// use openai_gpt_rs::{args::ChatArgs, client::Client, response::{ChatResp, Content}, models::ChatModels, chat::Message};
     /// use std::env;
     /// use std::collections::HashMap;
     ///
@@ -259,21 +273,17 @@ impl Client {
     /// async fn main() {
     ///     let client = Client::new(env::var("OPENAI_API_KEY").unwrap().as_str());
     ///
-    ///     let mut message1: HashMap<String, String> = HashMap::new();
-    ///     message1.insert("role".to_string(), "user".to_string());
-    ///     message1.insert(
-    ///         "content".to_string(),
-    ///         "Who won the world series in 2020?".to_string(),
-    ///     );
+    ///     let message1 = Message {
+    ///         role: "user".to_string(),
+    ///         content: "Who won the world series in 2020?".to_string(),
+    ///     };
     ///
-    ///     let mut message2: HashMap<String, String> = HashMap::new();
-    ///     message2.insert("role".to_string(), "system".to_string());
-    ///     message2.insert(
-    ///         "content".to_string(),
-    ///         "You are a helpful assistant.".to_string(),
-    ///     );
+    ///     let message2 = Message {
+    ///         role: "system".to_string(),
+    ///         content: "You are a helpful assistant.".to_string(),
+    ///     };
     ///
-    ///     let messages: Vec<HashMap<String, String>> = vec![message1, message2];
+    ///     let messages = vec![message1, message2];
     ///
     ///     let resp = client
     ///         .create_chat_completion(|args| args.messages(messages.clone()))
@@ -289,7 +299,7 @@ impl Client {
     /// This function will return an error if the api call fails.
     /// The error will be of type `reqwest::Error`.
     ///     
-    pub async fn create_chat_completion<T>(&self, arg: T) -> Result<ChatResp, Error>
+    pub async fn create_chat_completion<T>(&self, f: T) -> Result<ChatResp, ResponseError>
     where
         T: FnOnce(&mut ChatArgs) -> &mut ChatArgs,
     {
@@ -303,7 +313,7 @@ impl Client {
             presence_penalty: 0.0,
             frequency_penalty: 0.0,
         };
-        arg(&mut args);
+        f(&mut args);
 
         let body = json!({
         "model": args.model,
@@ -322,10 +332,15 @@ impl Client {
             .headers(self.header.clone())
             .json(&body)
             .send()
-            .await?;
+            .await
+            .unwrap();
 
-        Ok(ChatResp {
-            json: resp.json().await?,
-        })
+        let json: Value = resp.json().await.unwrap();
+
+        if let Some(e) = json.as_object().unwrap().get("error") {
+            return Err(serde_json::from_value(e.clone()).unwrap());
+        }
+
+        Ok(serde_json::from_value(json).unwrap())
     }
 }
