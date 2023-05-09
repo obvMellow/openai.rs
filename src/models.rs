@@ -53,8 +53,8 @@ impl Display for ChatModels {
             ChatModels::Gpt4_0314 => write!(f, "gpt-4-0314"),
             ChatModels::Gpt4_32k => write!(f, "gpt-4-32k"),
             ChatModels::Gpt4_32k0314 => write!(f, "gpt-4-32k-0314"),
-            ChatModels::Gpt3_5Turbo => write!(f, "gpt-3-5-turbo"),
-            ChatModels::Gpt3_5Turbo0301 => write!(f, "gpt-3-5-turbo-0301"),
+            ChatModels::Gpt3_5Turbo => write!(f, "gpt-3.5-turbo"),
+            ChatModels::Gpt3_5Turbo0301 => write!(f, "gpt-3.5-turbo-0301"),
         }
     }
 }
