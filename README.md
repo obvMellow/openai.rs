@@ -3,9 +3,7 @@
 A wrapper for OpenAI API written in Rust
 
 [![Rust](https://github.com/obvMellow/openai.rs/actions/workflows/rust.yml/badge.svg)](https://github.com/obvMellow/openai.rs/actions/workflows/rust.yml)
-[![rust-clippy analyze](https://github.com/obvMellow/openai.rs/actions/workflows/rust-clippy.yml/badge.svg)](https://github.com/obvMellow/openai.rs/actions/workflows/rust-clippy.yml)
 [![Crates.io](https://img.shields.io/crates/v/openai_gpt_rs)](https://crates.io/crates/openai_gpt_rs)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/c4d2a6bb48d74561a717cdbb8e6e85b6)](https://www.codacy.com/gh/obvMellow/openai.rs/dashboard?utm_source=github.com&utm_medium=referral&utm_content=obvMellow/openai.rs&utm_campaign=Badge_Grade)
 
 ## Usage Example
 
